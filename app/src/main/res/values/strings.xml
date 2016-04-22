@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">마루뷰어</string>
+    <string name="drawer_open">drawer_open</string>
+    <string name="drawer_close">drawer_close</string>
+    <string-array name = "url">
+        <item>http://marumaru.in/?c=1/40<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?c=1/44<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?c=1/28<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?c=1/29<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?c=1/30<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?c=1/31<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?c=1/32<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?c=1/33<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?c=1/27<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?c=1/34<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?c=1/35<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?c=1/36<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?c=1/37<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?c=1/38<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?c=1/39<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A17<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3ASF<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3ATS<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A개그<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A드라마<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A러브코미디<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A먹방<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A백합<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A붕탁<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A순정<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A스릴러<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A스포츠<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A시대<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A액션<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A일상+치유<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A추리<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A판타지<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A학원<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A호러<![CDATA[&]]>p=</item>
+    </string-array>
+    <string name="search">http://marumaru.in/?r=home<![CDATA[&]]>mod=search<![CDATA[&]]>keyword=%1$s</string>
+    <string name="htmlStart" formatted="false"><![CDATA[<html><head><style>img{margin-left:20px; margin-right:20px; margin-bottom:25px;}</style></head><body><center><p>]]></string>
+    <string name="htmlEnd"><![CDATA[</p></center></body></html>]]></string>
+    <string name="banner_ad_unit_id">ca-app-pub-3970497590731166/4514197737</string>
+</resources>
