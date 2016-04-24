@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:custom="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.dd.processbutton.iml.ActionProcessButton
+    <Button
         android:id="@+id/button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,13 +13,6 @@
         android:layout_marginRight="5dp"
         android:textColor="@android:color/white"
         android:textSize="18sp"
-        custom:pb_colorComplete="#00ff00"
-        custom:pb_colorNormal="#00f9ff"
-        custom:pb_colorPressed="#0000ff"
-        custom:pb_colorProgress="#ff00ff"
-        custom:pb_textComplete="Success"
-        custom:pb_textProgress="Loading"
-        custom:pb_textError="Error"
-        custom:pb_colorError="#ff0000" />
+        android:background="#ff9dcfff" />
 
 </LinearLayout>

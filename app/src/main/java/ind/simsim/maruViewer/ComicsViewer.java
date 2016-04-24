@@ -4,12 +4,8 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.view.ViewPager;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebSettings;
@@ -20,10 +16,6 @@ import android.widget.TextView;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -45,7 +37,10 @@ public class ComicsViewer extends Activity {
     private String title;
     private TextView textView;
     private Intent intent;
-    private String path;
+    private File file;
+    private FileWriter fw;
+    private BufferedWriter bw;
+    private String path, html;
     private WebView webView;
     private WebSettings settings;
     private Context context;
@@ -77,12 +72,22 @@ public class ComicsViewer extends Activity {
         });
 
         title = intent.getStringExtra("title");
+        html = intent.getStringExtra("html");
         textView = (TextView) mCustomView.findViewById(R.id.title);
         textView.setText(title);
         if (title.length() > 20)
             textView.setTextSize(15);
 
         path = getCacheDir() + "/maru.html";
+        file = new File(path);
+        try {
+            fw = new FileWriter(file);
+            bw = new BufferedWriter(fw);
+            bw.write(html.toString());
+            bw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         webView = (WebView) findViewById(R.id.webView);
         webView.setWebViewClient(new WebViewClient());
@@ -96,6 +101,13 @@ public class ComicsViewer extends Activity {
         webView.loadUrl("file://" + path);
     }
 
-
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            bw.close();
+            fw.close();
+        }catch (Exception e){
+        }
+    }
 }

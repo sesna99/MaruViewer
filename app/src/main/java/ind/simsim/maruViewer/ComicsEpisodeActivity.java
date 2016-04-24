@@ -13,13 +13,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.dd.processbutton.iml.ActionProcessButton;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
@@ -27,10 +27,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -45,10 +41,6 @@ public class ComicsEpisodeActivity extends Activity {
     private ArrayList<String> link;
     private Episode task;
     private String url, imageUrl;
-    private File file;
-    private FileWriter fw;
-    private BufferedWriter bw;
-    private String path;
     private int dWidth, dHeight;
     private Intent intent;
     private Context mContext;
@@ -69,15 +61,6 @@ public class ComicsEpisodeActivity extends Activity {
 
         View mCustomView = LayoutInflater.from(this).inflate(R.layout.custom_actionbar, null);
         actionBar.setCustomView(mCustomView);
-
-        path = getCacheDir() + "/maru.html";
-        file = new File(path);
-        try {
-            fw = new FileWriter(file);
-            bw = new BufferedWriter(fw);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         ImageButton imageButton = (ImageButton)mCustomView.findViewById(R.id.imageView);
         imageButton.setOnClickListener(new View.OnClickListener() {
@@ -194,10 +177,9 @@ public class ComicsEpisodeActivity extends Activity {
                 size = image.size();
                 int width = 0, height = 0;
                 Log.i("elementsSize", size + "");
-                long median = System.currentTimeMillis();
-                Log.i("time", (median - startTime) / 1000.f + "초");
+                Log.i("html", image.outerHtml());
                 for (int i = 0; i < size; i++) {
-                    if (image.get(i).attr("data-lazy-src").equals("")) {
+                    if (image.get(i).attr("data-src").equals("")) {
                         continue;
                     }
                     try {
@@ -212,7 +194,7 @@ public class ComicsEpisodeActivity extends Activity {
                     width = dWidth;
                     Log.i("width", width + "");
                     Log.i("height", height + "");
-                    html.append("<img src=").append(image.get(i).attr("data-lazy-src")).append(" width=").append(width).append(" height=").append(height).append("/> ");
+                    html.append("<img src=").append(image.get(i).attr("data-src")).append(" width=").append(width).append(" height=").append(height).append("/> ");
                 }
                 html.append(getResources().getString(R.string.htmlEnd));
                 Log.i("html", html.toString());
@@ -230,15 +212,11 @@ public class ComicsEpisodeActivity extends Activity {
 
         @Override
         protected void onPostExecute(Void mVoid) {
-            try {
-                bw.write(html.toString());
-                bw.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             intent = new Intent(mContext, ComicsViewer.class);
             intent.putExtra("title", episode.get(position));
+            intent.putExtra("html", html.toString());
             startActivity(intent);
+            holder.episode.setText(episode.get(position));
         }
     }
 
@@ -285,8 +263,7 @@ public class ComicsEpisodeActivity extends Activity {
             if(convertView == null){
                 convertView = inflater.inflate(layout, parent, false);
                 holder = new ViewHolder();
-                holder.episode = (ActionProcessButton)convertView.findViewById(R.id.button);
-                holder.episode.setMode(ActionProcessButton.Mode.ENDLESS);
+                holder.episode = (Button)convertView.findViewById(R.id.button);
                 convertView.setTag(holder);
             }
             else{
@@ -308,12 +285,12 @@ public class ComicsEpisodeActivity extends Activity {
                             finish();
                         }
                         else{
-                            holder.episode.setProgress(75);
+                            holder.episode.setText("Loading");
                             new Comics().execute(objects);
                         }
                     }
                     else{
-                        holder.episode.setProgress(75);
+                        holder.episode.setText("Loading");
                         new Comics().execute(objects);
                     }
                 }
@@ -323,7 +300,7 @@ public class ComicsEpisodeActivity extends Activity {
         }
 
         class ViewHolder{
-            private ActionProcessButton episode;
+            private Button episode;
         }
     }
 
@@ -338,12 +315,6 @@ public class ComicsEpisodeActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         task.cancel(true);
-        try {
-            bw.close();
-            fw.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }
 
