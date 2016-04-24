@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -182,6 +181,7 @@ public class ComicsEpisodeActivity extends Activity {
             objects = params[0];
             holder = (ComicsEpisodeAdapter.ViewHolder) objects.get(0);
             position = (int) objects.get(1);
+            Log.i("link", link.get(position)+"");
             try {
                 long startTime = System.currentTimeMillis();
 
