@@ -3,9 +3,12 @@ package ind.simsim.maruViewer;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.res.Configuration;
-import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -28,10 +31,17 @@ import com.google.android.gms.ads.AdView;
 import com.ikimuhendis.ldrawer.ActionBarDrawerToggle;
 import com.ikimuhendis.ldrawer.DrawerArrowDrawable;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 
 public class SampleActivity extends FragmentActivity {
+    private MarketVersionChecker checker;
     private SharedPreferences preferences;
     private SharedPreferences.Editor edit;
     private DrawerLayout mDrawerLayout;
@@ -43,6 +53,7 @@ public class SampleActivity extends FragmentActivity {
     private ArrayList<Fragment> fragmentArray;
     private Bundle bundle;
     private MenuItem searchMenu;
+    private String store_version, device_version, rtn, verSion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +63,8 @@ public class SampleActivity extends FragmentActivity {
         ab.setDisplayShowTitleEnabled(false);
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setHomeButtonEnabled(true);
+
+        new Version().execute();
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         edit = preferences.edit();
@@ -282,5 +295,70 @@ public class SampleActivity extends FragmentActivity {
                     clearApplicationCache(children[i]);
                 else children[i].delete();
         } catch(Exception e){}
+    }
+
+    class Version extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+
+            // Confirmation of market information in the Google Play Store
+            try {
+                Document doc = Jsoup
+                        .connect("https://play.google.com/store/apps/details?id=" + getPackageName())
+                        .get();
+                Elements Version = doc.select(".content");
+
+                for (Element v : Version) {
+                    if (v.attr("itemprop").equals("softwareVersion")) {
+                        rtn = v.text();
+                    }
+                }
+                return rtn;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Toast.makeText(SampleActivity.this, result, Toast.LENGTH_SHORT).show();
+            // Version check the execution application.
+            PackageInfo pi = null;
+            try {
+                pi = getPackageManager().getPackageInfo(getPackageName(), 0);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            verSion = pi.versionName;
+            Toast.makeText(SampleActivity.this, verSion, Toast.LENGTH_SHORT).show();
+            rtn = result;
+
+            if (!verSion.equals(rtn)) {
+                AlertDialog updateDialog = new AlertDialog.Builder(SampleActivity.this)
+                        .setTitle("업데이트가 발견되었습니다.")
+                        .setMessage("업데이트가 있습니다.\n 업데이트 후 이용이 가능합니다.")
+                        .setCancelable(false)
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                intent.setData(Uri.parse("market://details?id="+getPackageName()));
+                                startActivity(intent);
+                                finish();
+                            }
+                        })
+                        .show();
+            }
+
+            super.onPostExecute(result);
+        }
     }
 }
