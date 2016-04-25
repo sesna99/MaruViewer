@@ -329,7 +329,6 @@ public class SampleActivity extends FragmentActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            Toast.makeText(SampleActivity.this, result, Toast.LENGTH_SHORT).show();
             // Version check the execution application.
             PackageInfo pi = null;
             try {
@@ -338,7 +337,6 @@ public class SampleActivity extends FragmentActivity {
                 e.printStackTrace();
             }
             verSion = pi.versionName;
-            Toast.makeText(SampleActivity.this, verSion, Toast.LENGTH_SHORT).show();
             rtn = result;
 
             if (!verSion.equals(rtn)) {
