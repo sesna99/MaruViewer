@@ -115,7 +115,6 @@ public class ComicsListFragment extends Fragment{
                         arrayImage.add(temp.substring(21, temp.length()-1));
                     else
                         arrayImage.add("http://marumaru.in" + temp.substring(21, temp.length()-1));
-                    Log.i("link", arrayImage.get(i));
                     temp = link.get(i).attr("onclick");
                     arrayLink.add(temp.substring(8, temp.length()-3));
                     arrayTitle.add(title.get(i).text());
