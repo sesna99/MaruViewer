@@ -64,7 +64,7 @@ public class SampleActivity extends FragmentActivity {
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setHomeButtonEnabled(true);
 
-        new Version().execute();
+        //new Version().execute();
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         edit = preferences.edit();
