@@ -24,7 +24,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.ikimuhendis:ldrawer:0.1'
     compile 'com.github.bumptech.glide:glide:3.7.0'
-    compile 'com.google.android.gms:play-services:6.+'
     compile 'com.github.dmytrodanylyk.android-process-button:library:1.0.4'
     compile files('libs/jsoup-1.8.3.jar')
 }

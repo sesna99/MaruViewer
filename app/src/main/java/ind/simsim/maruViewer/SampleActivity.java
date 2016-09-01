@@ -26,8 +26,6 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.ikimuhendis.ldrawer.ActionBarDrawerToggle;
 import com.ikimuhendis.ldrawer.DrawerArrowDrawable;
 
@@ -68,13 +66,9 @@ public class SampleActivity extends FragmentActivity {
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         edit = preferences.edit();
-        if(preferences.getString("password", "").equals("")){
+        /*if(preferences.getString("password", "").equals("")){
             createDialog();
-        }
-
-        AdView mAdView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
+        }*/
 
         initDrawer();
         initFragment();
