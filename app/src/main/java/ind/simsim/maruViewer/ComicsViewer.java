@@ -14,6 +14,10 @@ import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -56,7 +60,7 @@ public class ComicsViewer extends Activity {
         mCustomView = LayoutInflater.from(this).inflate(R.layout.custom_actionbar, null);
         actionBar.setCustomView(mCustomView);
 
-        imageButton = (ImageButton) mCustomView.findViewById(R.id.imageView);
+        imageButton = (ImageButton) mCustomView.findViewById(R.id.back);
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,7 +73,7 @@ public class ComicsViewer extends Activity {
         textView = (TextView) mCustomView.findViewById(R.id.title);
         textView.setText(title);
         if (title.length() > 20)
-            textView.setTextSize(15);
+            textView.setTextSize(13);
 
         path = getCacheDir() + "/maru.html";
         file = new File(path);
@@ -92,8 +96,23 @@ public class ComicsViewer extends Activity {
         settings.setLoadWithOverviewMode(true);
 
         webView.loadUrl("file://" + path);
+
+        Tracker t = ((ApplicationController)getApplication()).getTracker(ApplicationController.TrackerName.APP_TRACKER);
+        t.setScreenName("ComicsViewer");
+        t.send(new HitBuilders.AppViewBuilder().build());
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        GoogleAnalytics.getInstance(this).reportActivityStart(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        GoogleAnalytics.getInstance(this).reportActivityStop(this);
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();

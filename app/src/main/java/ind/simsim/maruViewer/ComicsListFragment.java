@@ -77,6 +77,7 @@ public class ComicsListFragment extends Fragment{
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), ComicsEpisodeActivity.class);
                 intent.putExtra("url", arrayLink.get(position));
+                intent.putExtra("title", arrayTitle.get(position));
                 startActivity(intent);
             }
         });

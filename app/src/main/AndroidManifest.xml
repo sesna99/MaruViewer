@@ -8,12 +8,13 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
+        android:name=".ApplicationController"
         android:allowBackup="true"
         android:label="@string/app_name"
         android:icon="@drawable/ic_launcher"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="ind.simsim.maruViewer.SampleActivity" >
+            android:name=".MainActivity" >
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,6 +28,10 @@
 
         <activity android:name="ind.simsim.maruViewer.ComicsViewer"></activity>
         <activity android:name="ind.simsim.maruViewer.ComicsEpisodeActivity"></activity>
+
+
+        <meta-data android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
     </application>
 

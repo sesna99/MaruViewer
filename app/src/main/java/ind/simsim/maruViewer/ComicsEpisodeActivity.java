@@ -3,10 +3,12 @@ package ind.simsim.maruViewer;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +20,12 @@ import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -51,11 +58,20 @@ public class ComicsEpisodeActivity extends Activity {
     private BufferedWriter bw;
     private String path;
     private StringBuilder html;
+    private ArrayList<Item> itemList;
+    private String items[];
+    private boolean selectedItems[];
+    private String title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comics_episode);
+
+        url = getIntent().getStringExtra("url");
+        url = url.contains("marumaru") ? url : "http://marumaru.in" + url;
+
+        title = getIntent().getStringExtra("title");
 
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayShowCustomEnabled(true);
@@ -65,16 +81,43 @@ public class ComicsEpisodeActivity extends Activity {
         View mCustomView = LayoutInflater.from(this).inflate(R.layout.custom_actionbar, null);
         actionBar.setCustomView(mCustomView);
 
-        ImageButton imageButton = (ImageButton) mCustomView.findViewById(R.id.imageView);
-        imageButton.setOnClickListener(new View.OnClickListener() {
+        ImageButton back = (ImageButton) mCustomView.findViewById(R.id.back);
+        back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
 
-        url = getIntent().getStringExtra("url");
-        url = url.contains("marumaru") ? url : "http://marumaru.in" + url;
+        TextView titleView = (TextView) mCustomView.findViewById(R.id.title);
+        titleView.setText(title);
+
+        ImageButton save = (ImageButton) mCustomView.findViewById(R.id.save);
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(getApplicationContext());
+                dialog.setTitle("관심분야를 선택하세요.")
+                        .setMultiChoiceItems(
+                                items,
+                                selectedItems,
+                                new DialogInterface.OnMultiChoiceClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                                    }
+                                })
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if(selectedItems.length == 0)
+                                    Toast.makeText(ComicsEpisodeActivity.this, "선택된 화가 없습니다.", Toast.LENGTH_SHORT).show();
+                                else
+                                    new SaveComics().execute();
+                            }
+                        }).create().show();
+            }
+        });
+
         /*listView = (ListView) findViewById(R.id.listView);
         header = getLayoutInflater().inflate(R.layout.comics_episode_header, null, false);
         image = (ImageView)header.findViewById(R.id.imageView);
@@ -106,6 +149,22 @@ public class ComicsEpisodeActivity extends Activity {
 
         task = new Episode();
         task.execute();
+
+        Tracker t = ((ApplicationController)getApplication()).getTracker(ApplicationController.TrackerName.APP_TRACKER);
+        t.setScreenName("ComicsEpisodeActivity");
+        t.send(new HitBuilders.AppViewBuilder().build());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        GoogleAnalytics.getInstance(this).reportActivityStart(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
 
     class Episode extends AsyncTask<Void, Void, Void> {
@@ -117,38 +176,34 @@ public class ComicsEpisodeActivity extends Activity {
 
         @Override
         protected Void doInBackground(Void... params) {
+            itemList = new ArrayList<>();
             try {
-                long startTime = System.currentTimeMillis();
                 Document document = Jsoup.connect(url).timeout(0).get();
-                Elements episode = document.select("a[href*=shencomics]");
-                Elements episode2 = document.select("a[href*=yuncomics]");
-                Elements allEpisode = document.select("a[href*=maru][target*=blank]");
-                Elements script = document.select("script");
                 Elements image = document.select("div img[src*=quickimage]");
+                Elements content = document.select("div[class=content] a");
                 html = new StringBuilder();
                 html.append("<html><body><div style=\"text-align: center\"><img src=\"").append(image.attr("src")).append("\" width=").append(dWidth / 3.5).append(" height=").append(dHeight / 2.5).append("></div><br>");
                 html.append("<div align=\"center\" style=\"color: rgb(0, 0, 0); font-family: dotum; font-size: 12px; line-height: 19.2px; text-align: center;\"><br>");
-                int size = episode.size();
-                Log.i("elementsSize", size + "");
+
+                int size = content.size();
                 for (int i = 0; i < size; i++) {
-                    if(!episode.get(i).attr("href").equals(""))
-                        html.append("<div align=\"center\" style=\"line-height: 19.2px;\"><a target=\"_blank\" href=\"").append(episode.get(i).attr("href").replace("www.shencomics", "blog.yuncomics")).append("\" target=\"_self\"><font color=\"#717171\" style=\"color: rgb(113, 113, 113); text-decoration: none;\"><span style=\"font-size: 18.6667px; line-height: 19.2px;\">").append(episode.get(i).text()).append("</span></font></a></div><br>");
+                    if (!content.get(i).attr("href").equals("")) {
+                        if(!content.get(i).attr("href").contains("http"))
+                            break;
+                        html.append("<div align=\"center\" style=\"line-height: 19.2px;\"><a target=\"_blank\" href=\"").append(content.get(i).attr("href").replace("shencomics","yuncomics")).append("\" target=\"_self\"><font color=\"#717171\" style=\"color: rgb(113, 113, 113); text-decoration: none;\"><span style=\"font-size: 18.6667px; line-height: 19.2px;\">").append(content.get(i).text()).append("</span></font></a></div><br>");
+                        itemList.add(new Item(content.get(i).text(), content.get(i).attr("href").replace("shencomics","yuncomics")));
+                    }
                 }
-                size = episode2.size();
-                Log.i("elementsSize", size + "");
-                for (int i = 0; i < size; i++) {
-                    if(!episode2.get(i).attr("href").equals(""))
-                        html.append("<div align=\"center\" style=\"line-height: 19.2px;\"><a target=\"_blank\" href=\"").append(episode2.get(i).attr("href")).append("\" target=\"_self\"><font color=\"#717171\" style=\"color: rgb(113, 113, 113); text-decoration: none;\"><span style=\"font-size: 18.6667px; line-height: 19.2px;\">").append(episode2.get(i).text()).append("</span></font></a></div><br>");
-                }
-                if(!allEpisode.text().equals(""))
-                    html.append("<div align=\"center\" style=\"line-height: 19.2px;\"><a target=\"_blank\" href=\"").append(allEpisode.get(0).attr("href")).append("\" target=\"_self\"><font color=\"#717171\" style=\"color: rgb(113, 113, 113); text-decoration: none;\"><span style=\"font-size: 18.6667px; line-height: 19.2px;\">").append(allEpisode.get(0).text()).append("</span></font></a></div><br>");
 
                 html.append("</div></body></html>");
-                Log.i("html", html.toString());
 
-                long endTime = System.currentTimeMillis();
-                Log.i("time", (endTime - startTime) / 1000.f + "초");
-
+                size = itemList.size();
+                items = new String[size];
+                selectedItems = new boolean[size];
+                for(int i = 0; i < size; i++) {
+                    items[i] = itemList.get(i).getTitle();
+                    selectedItems[i] = false;
+                }
                 document = null;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -184,7 +239,6 @@ public class ComicsEpisodeActivity extends Activity {
         protected Void doInBackground(String... params) {
             url = params[0];
             try {
-                long startTime = System.currentTimeMillis();
 
                 Document document = Jsoup.connect(url).cookie("wp-postpass_e1ac6d6cb3b647764881f16d009c885c", "%24P%24B7TTtyw0aLlsT1XDbHUOnmABsLoItB0").timeout(0).userAgent("Mozilla/5.0").post();
                 image = document.select("img[class*=alignnone]");
@@ -216,10 +270,6 @@ public class ComicsEpisodeActivity extends Activity {
                     html.append("<img src=").append(image.get(i).attr("data-src")).append(" width=").append(width).append(" height=").append(height).append("/> ");
                 }
                 html.append(getResources().getString(R.string.htmlEnd));
-                Log.i("html", html.toString());
-
-                long endTime = System.currentTimeMillis();
-                Log.i("time", (endTime - startTime) / 1000.f + "초");
 
                 document = null;
             } catch (Exception e) {
@@ -236,6 +286,47 @@ public class ComicsEpisodeActivity extends Activity {
             intent.putExtra("title", title.substring(0, title.length() - 12));
             intent.putExtra("html", html.toString());
             startActivity(intent);
+        }
+    }
+
+    class SaveComics extends AsyncTask<Void, Void, Void> {
+        private Elements image;
+        private int size;
+        private String path;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            for (int i = 0; i < selectedItems.length; i++) {
+                if(selectedItems[i]) {
+                    try {
+                        Document document = Jsoup.connect(itemList.get(i).getUrl()).cookie("wp-postpass_e1ac6d6cb3b647764881f16d009c885c", "%24P%24B7TTtyw0aLlsT1XDbHUOnmABsLoItB0").timeout(0).userAgent("Mozilla/5.0").post();
+                        image = document.select("img[class*=alignnone]");
+
+                        size = image.size();
+                        int width = 0, height = 0;
+                        for (int j = 0; j < size; j++) {
+                            if (image.get(j).attr("data-src").equals("")) {
+                                continue;
+                            }
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void mVoid) {
+
         }
     }
 
@@ -259,7 +350,6 @@ public class ComicsEpisodeActivity extends Activity {
                     }
                 }
             }catch (Exception e){
-                e.printStackTrace();
             }
         }
     }
@@ -275,6 +365,24 @@ public class ComicsEpisodeActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         task.cancel(true);
+    }
+
+    class Item {
+        private String title;
+        private String url;
+
+        public Item(String title, String url) {
+            this.title = title;
+            this.url = url;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getUrl() {
+            return url;
+        }
     }
 }
 

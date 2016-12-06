@@ -26,6 +26,9 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.ikimuhendis.ldrawer.ActionBarDrawerToggle;
 import com.ikimuhendis.ldrawer.DrawerArrowDrawable;
 
@@ -38,7 +41,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 
-public class SampleActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity {
     private MarketVersionChecker checker;
     private SharedPreferences preferences;
     private SharedPreferences.Editor edit;
@@ -72,6 +75,22 @@ public class SampleActivity extends FragmentActivity {
 
         initDrawer();
         initFragment();
+
+        Tracker t = ((ApplicationController)getApplication()).getTracker(ApplicationController.TrackerName.APP_TRACKER);
+        t.setScreenName("MainAcitivty");
+        t.send(new HitBuilders.AppViewBuilder().build());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        GoogleAnalytics.getInstance(this).reportActivityStart(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
 
     private void createDialog(){
@@ -142,7 +161,7 @@ public class SampleActivity extends FragmentActivity {
         header.findViewById(R.id.bookMark).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(SampleActivity.this, "mark", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "mark", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -334,7 +353,7 @@ public class SampleActivity extends FragmentActivity {
             rtn = result;
 
             if (!verSion.equals(rtn)) {
-                AlertDialog updateDialog = new AlertDialog.Builder(SampleActivity.this)
+                AlertDialog updateDialog = new AlertDialog.Builder(MainActivity.this)
                         .setTitle("업데이트가 발견되었습니다.")
                         .setMessage("업데이트가 있습니다.\n 업데이트 후 이용이 가능합니다.")
                         .setCancelable(false)

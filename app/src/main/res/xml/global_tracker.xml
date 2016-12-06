@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="TypographyDashes">
+
+    <string name="ga_logLevel">verbose</string>
+
+    <!-- Enable automatic Activity measurement -->
+    <bool name="ga_autoActivityTracking">true</bool>
+
+    <!-- The screen names that will appear in reports -->
+    <screenName name="ind.simsim.maruViewer.MainActivity">
+        MainActivity
+    </screenName>
+    <screenName name="ind.simsim.maruViewer.ComicsEpisodeActivity">
+        ComicsEpisode
+    </screenName>
+    <screenName name="ind.simsim.maruViewer.ComicsViewer">
+        ComicsViewer
+    </screenName>
+    <!--  The following value should be replaced with correct property id. -->
+    <string name="ga_trackingId">UA-88239634-1</string>
+</resources>
