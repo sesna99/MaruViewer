@@ -24,16 +24,12 @@
             android:id="@+id/title"
             android:layout_centerInParent="true"
             android:layout_marginLeft="20dp"
-            android:gravity="center_vertical"/>
+            android:gravity="center_vertical"
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:singleLine="true"/>
 
     </RelativeLayout>
-
-    <ImageButton
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:layout_gravity="center"
-        android:background="@drawable/save"
-        android:layout_marginRight="20dp"
-        android:id="@+id/save" />
 
 </LinearLayout>

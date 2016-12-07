@@ -28,10 +28,6 @@ import java.util.ArrayList;
  * Created by admin on 2016-02-18.
  */
 public class ComicsViewer extends Activity {
-    private ViewPager comics;
-    private ComicsViewerAdapter adapter;
-    private ArrayList<String> imageArray;
-    private String url;
     private View mCustomView;
     private ActionBar actionBar;
     private ImageButton imageButton;
@@ -72,8 +68,7 @@ public class ComicsViewer extends Activity {
         html = intent.getStringExtra("html");
         textView = (TextView) mCustomView.findViewById(R.id.title);
         textView.setText(title);
-        if (title.length() > 20)
-            textView.setTextSize(13);
+        textView.setSelected(true);
 
         path = getCacheDir() + "/maru.html";
         file = new File(path);

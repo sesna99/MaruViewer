@@ -42,9 +42,6 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends FragmentActivity {
-    private MarketVersionChecker checker;
-    private SharedPreferences preferences;
-    private SharedPreferences.Editor edit;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private View header;
@@ -54,7 +51,6 @@ public class MainActivity extends FragmentActivity {
     private ArrayList<Fragment> fragmentArray;
     private Bundle bundle;
     private MenuItem searchMenu;
-    private String store_version, device_version, rtn, verSion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,14 +60,6 @@ public class MainActivity extends FragmentActivity {
         ab.setDisplayShowTitleEnabled(false);
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setHomeButtonEnabled(true);
-
-        //new Version().execute();
-
-        preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        edit = preferences.edit();
-        /*if(preferences.getString("password", "").equals("")){
-            createDialog();
-        }*/
 
         initDrawer();
         initFragment();
@@ -91,33 +79,6 @@ public class MainActivity extends FragmentActivity {
     protected void onStop() {
         super.onStop();
         GoogleAnalytics.getInstance(this).reportActivityStop(this);
-    }
-
-    private void createDialog(){
-        final EditText passWord = new EditText(this);
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("초기설정")
-                .setMessage("qndxkr을 입력하세요")
-                .setCancelable(false)
-                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (passWord.getText().toString().equals("qndxkr")) {
-                            edit.putString("password", "qndxkr");
-                            edit.commit();
-                        } else {
-                            createDialog();
-                        }
-                    }
-                })
-                .setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                })
-                .setView(passWord)
-                .show();
     }
 
     private void initDrawer(){
@@ -186,7 +147,6 @@ public class MainActivity extends FragmentActivity {
     private void initFragment(){
         fragmentArray = new ArrayList<>();
         String[] url = getResources().getStringArray(R.array.url);
-        int position = 0;
         for(String temp : url){
             fragment = new ComicsListFragment();
             bundle = new Bundle();
@@ -308,68 +268,5 @@ public class MainActivity extends FragmentActivity {
                     clearApplicationCache(children[i]);
                 else children[i].delete();
         } catch(Exception e){}
-    }
-
-    class Version extends AsyncTask<Void, Void, String> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-
-            // Confirmation of market information in the Google Play Store
-            try {
-                Document doc = Jsoup
-                        .connect("https://play.google.com/store/apps/details?id=" + getPackageName())
-                        .get();
-                Elements Version = doc.select(".content");
-
-                for (Element v : Version) {
-                    if (v.attr("itemprop").equals("softwareVersion")) {
-                        rtn = v.text();
-                    }
-                }
-                return rtn;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            // Version check the execution application.
-            PackageInfo pi = null;
-            try {
-                pi = getPackageManager().getPackageInfo(getPackageName(), 0);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            verSion = pi.versionName;
-            rtn = result;
-
-            if (!verSion.equals(rtn)) {
-                AlertDialog updateDialog = new AlertDialog.Builder(MainActivity.this)
-                        .setTitle("업데이트가 발견되었습니다.")
-                        .setMessage("업데이트가 있습니다.\n 업데이트 후 이용이 가능합니다.")
-                        .setCancelable(false)
-                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(Intent.ACTION_VIEW);
-                                intent.setData(Uri.parse("market://details?id="+getPackageName()));
-                                startActivity(intent);
-                                finish();
-                            }
-                        })
-                        .show();
-            }
-
-            super.onPostExecute(result);
-        }
     }
 }

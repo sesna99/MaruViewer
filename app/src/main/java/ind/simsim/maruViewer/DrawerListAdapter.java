@@ -14,8 +14,6 @@ import java.util.Map;
  * Created by admin on 2016-02-17.
  */
 public class DrawerListAdapter extends BaseAdapter {
-
-
     public final Map<String, Adapter> sections = new LinkedHashMap<String, Adapter>();
     public final ArrayAdapter<String> headers;
     public final static int TYPE_SECTION_HEADER = 0;

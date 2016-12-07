@@ -41,13 +41,8 @@ import java.util.ArrayList;
  * Created by admin on 2016-02-19.
  */
 public class ComicsEpisodeActivity extends Activity {
-    private ListView listView;
-    private View header;
-    private ImageView image;
-    private ArrayList<String> episode;
-    private ArrayList<String> link;
     private Episode task;
-    private String url, imageUrl;
+    private String url;
     private int dWidth, dHeight;
     private Intent intent;
     private Context mContext;
@@ -58,9 +53,6 @@ public class ComicsEpisodeActivity extends Activity {
     private BufferedWriter bw;
     private String path;
     private StringBuilder html;
-    private ArrayList<Item> itemList;
-    private String items[];
-    private boolean selectedItems[];
     private String title;
 
     @Override
@@ -70,6 +62,8 @@ public class ComicsEpisodeActivity extends Activity {
 
         url = getIntent().getStringExtra("url");
         url = url.contains("marumaru") ? url : "http://marumaru.in" + url;
+
+        Log.d("url", url);
 
         title = getIntent().getStringExtra("title");
 
@@ -91,41 +85,7 @@ public class ComicsEpisodeActivity extends Activity {
 
         TextView titleView = (TextView) mCustomView.findViewById(R.id.title);
         titleView.setText(title);
-
-        ImageButton save = (ImageButton) mCustomView.findViewById(R.id.save);
-        save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(getApplicationContext());
-                dialog.setTitle("관심분야를 선택하세요.")
-                        .setMultiChoiceItems(
-                                items,
-                                selectedItems,
-                                new DialogInterface.OnMultiChoiceClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                                    }
-                                })
-                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if(selectedItems.length == 0)
-                                    Toast.makeText(ComicsEpisodeActivity.this, "선택된 화가 없습니다.", Toast.LENGTH_SHORT).show();
-                                else
-                                    new SaveComics().execute();
-                            }
-                        }).create().show();
-            }
-        });
-
-        /*listView = (ListView) findViewById(R.id.listView);
-        header = getLayoutInflater().inflate(R.layout.comics_episode_header, null, false);
-        image = (ImageView)header.findViewById(R.id.imageView);
-        adapter = new ComicsEpisodeAdapter(this, R.layout.comics_episode_item, episode);
-        listView.addHeaderView(header);
-        listView.setAdapter(adapter);*/
-        episode = new ArrayList<>();
-        link = new ArrayList<>();
+        titleView.setSelected(true);
 
         path = getCacheDir() + "/episode.html";
         file = new File(path);
@@ -176,7 +136,6 @@ public class ComicsEpisodeActivity extends Activity {
 
         @Override
         protected Void doInBackground(Void... params) {
-            itemList = new ArrayList<>();
             try {
                 Document document = Jsoup.connect(url).timeout(0).get();
                 Elements image = document.select("div img[src*=quickimage]");
@@ -191,19 +150,11 @@ public class ComicsEpisodeActivity extends Activity {
                         if(!content.get(i).attr("href").contains("http"))
                             break;
                         html.append("<div align=\"center\" style=\"line-height: 19.2px;\"><a target=\"_blank\" href=\"").append(content.get(i).attr("href").replace("shencomics","yuncomics")).append("\" target=\"_self\"><font color=\"#717171\" style=\"color: rgb(113, 113, 113); text-decoration: none;\"><span style=\"font-size: 18.6667px; line-height: 19.2px;\">").append(content.get(i).text()).append("</span></font></a></div><br>");
-                        itemList.add(new Item(content.get(i).text(), content.get(i).attr("href").replace("shencomics","yuncomics")));
                     }
                 }
 
                 html.append("</div></body></html>");
 
-                size = itemList.size();
-                items = new String[size];
-                selectedItems = new boolean[size];
-                for(int i = 0; i < size; i++) {
-                    items[i] = itemList.get(i).getTitle();
-                    selectedItems[i] = false;
-                }
                 document = null;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -289,47 +240,6 @@ public class ComicsEpisodeActivity extends Activity {
         }
     }
 
-    class SaveComics extends AsyncTask<Void, Void, Void> {
-        private Elements image;
-        private int size;
-        private String path;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            for (int i = 0; i < selectedItems.length; i++) {
-                if(selectedItems[i]) {
-                    try {
-                        Document document = Jsoup.connect(itemList.get(i).getUrl()).cookie("wp-postpass_e1ac6d6cb3b647764881f16d009c885c", "%24P%24B7TTtyw0aLlsT1XDbHUOnmABsLoItB0").timeout(0).userAgent("Mozilla/5.0").post();
-                        image = document.select("img[class*=alignnone]");
-
-                        size = image.size();
-                        int width = 0, height = 0;
-                        for (int j = 0; j < size; j++) {
-                            if (image.get(j).attr("data-src").equals("")) {
-                                continue;
-                            }
-                        }
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void mVoid) {
-
-        }
-    }
-
     class CustomWebViewClient extends WebViewClient {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
@@ -339,7 +249,6 @@ public class ComicsEpisodeActivity extends Activity {
                     if (!url.contains("maru")) {
                         view.stopLoading();
                         view.goBack();
-                        Log.i("url", url);
                         new Comics().execute(url);
                     }
                     else{
@@ -367,22 +276,5 @@ public class ComicsEpisodeActivity extends Activity {
         task.cancel(true);
     }
 
-    class Item {
-        private String title;
-        private String url;
-
-        public Item(String title, String url) {
-            this.title = title;
-            this.url = url;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public String getUrl() {
-            return url;
-        }
-    }
 }
 
