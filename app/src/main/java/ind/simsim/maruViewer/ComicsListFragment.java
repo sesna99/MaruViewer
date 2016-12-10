@@ -12,6 +12,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -29,6 +32,7 @@ public class ComicsListFragment extends Fragment{
     private View footer;
     private int order = 1;
     private Bundle bundle;
+    private SwipyRefreshLayout swipyRefreshLayout;
 
     public ComicsListFragment() {
     }
@@ -58,15 +62,16 @@ public class ComicsListFragment extends Fragment{
 
         mComicsList = (ListView)v.findViewById(R.id.listView);
         adapter = new ComicsListAdapter(getActivity(), R.layout.list_item, comicsData);
-        footer = getActivity().getLayoutInflater().inflate(R.layout.list_footer, null, false);
-        footer.findViewById(R.id.footer).setOnClickListener(new View.OnClickListener() {
+
+        swipyRefreshLayout = (SwipyRefreshLayout)v.findViewById(R.id.refreshlist);
+        swipyRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
             @Override
-            public void onClick(View v) {
+            public void onRefresh(SwipyRefreshLayoutDirection swipyRefreshLayoutDirection) {
                 new ComicsList().execute();
+                swipyRefreshLayout.setRefreshing(false);
             }
         });
 
-        mComicsList.addFooterView(footer);
         mComicsList.setAdapter(adapter);
         mComicsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
