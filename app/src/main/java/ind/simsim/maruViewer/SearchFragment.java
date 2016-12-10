@@ -24,9 +24,7 @@ import java.util.ArrayList;
 public class SearchFragment extends Fragment{
     private ListView mComicsList;
     private String url;
-    private ArrayList<String> arrayImage;
-    private ArrayList<String> arrayLink;
-    private ArrayList<String> arrayTitle;
+    private ArrayList<ComicsData> comicsDatas;
     private ComicsListAdapter adapter;
     private Bundle bundle;
 
@@ -53,18 +51,16 @@ public class SearchFragment extends Fragment{
     }
 
     private void initList(View v){
-        arrayImage = new ArrayList<>();
-        arrayLink = new ArrayList<>();
-        arrayTitle = new ArrayList<>();
+        comicsDatas = new ArrayList<>();
 
         mComicsList = (ListView)v.findViewById(R.id.listView);
-        adapter = new ComicsListAdapter(getActivity(), R.layout.list_item, arrayTitle, arrayImage);
+        adapter = new ComicsListAdapter(getActivity(), R.layout.list_item, comicsDatas);
         mComicsList.setAdapter(adapter);
         mComicsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), ComicsEpisodeActivity.class);
-                intent.putExtra("url", arrayLink.get(position));
+                intent.putExtra("url", comicsDatas.get(position).getLink());
                 startActivity(intent);
             }
         });
@@ -96,10 +92,14 @@ public class SearchFragment extends Fragment{
                 int size = image.size();
                 Log.i("url", url);
                 Log.i("elementsSize", size + "");
+
+                ComicsData data;
                 for(int i = 0; i < size; i++){
-                    arrayImage.add(image.get(i).attr("src"));
-                    arrayLink.add(link.get(i).attr("href"));
-                    arrayTitle.add(title.get(i).text());
+                    data = new ComicsData();
+                    data.setImage(image.get(i).attr("src"));
+                    data.setLink(link.get(i).attr("href"));
+                    data.setTitle(title.get(i).text());
+                    comicsDatas.add(data);
                 }
 
                 document = null;
@@ -116,8 +116,7 @@ public class SearchFragment extends Fragment{
         @Override
         protected void onPostExecute(Void mVoid) {
             dialog.dismiss();
-            adapter.addTitleArray(arrayTitle);
-            adapter.addImageArray(arrayImage);
+            adapter.addComicsData(comicsDatas);
             adapter.refresh();
         }
     }

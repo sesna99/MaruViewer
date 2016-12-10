@@ -87,6 +87,16 @@ public class ComicsEpisodeActivity extends Activity {
         titleView.setText(title);
         titleView.setSelected(true);
 
+        final Activity activity = this;
+
+        ImageButton save = (ImageButton) mCustomView.findViewById(R.id.save);
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new ComicsSave().save(activity, url);
+            }
+        });
+
         path = getCacheDir() + "/episode.html";
         file = new File(path);
         try {
@@ -189,10 +199,10 @@ public class ComicsEpisodeActivity extends Activity {
         @Override
         protected Void doInBackground(String... params) {
             url = params[0];
+            Log.d("url", url);
             try {
-
-                Document document = Jsoup.connect(url).cookie("wp-postpass_e1ac6d6cb3b647764881f16d009c885c", "%24P%24B7TTtyw0aLlsT1XDbHUOnmABsLoItB0").timeout(0).userAgent("Mozilla/5.0").post();
-                image = document.select("img[class*=alignnone]");
+                Document document = Jsoup.connect(url).timeout(0).post();
+                image = document.select("img");
                 title = document.select("title");
 
                 html = new StringBuilder();
@@ -201,7 +211,7 @@ public class ComicsEpisodeActivity extends Activity {
                 size = image.size();
                 int width = 0, height = 0;
                 Log.i("elementsSize", size + "");
-                Log.i("html", image.outerHtml());
+
                 for (int i = 0; i < size; i++) {
                     if (image.get(i).attr("data-src").equals("")) {
                         continue;

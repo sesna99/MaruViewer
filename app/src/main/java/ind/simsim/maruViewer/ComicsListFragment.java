@@ -24,9 +24,7 @@ import java.util.ArrayList;
 public class ComicsListFragment extends Fragment{
     private ListView mComicsList;
     private String url;
-    private ArrayList<String> arrayImage;
-    private ArrayList<String> arrayLink;
-    private ArrayList<String> arrayTitle;
+    private ArrayList<ComicsData> comicsData;
     private ComicsListAdapter adapter;
     private View footer;
     private int order = 1;
@@ -56,12 +54,10 @@ public class ComicsListFragment extends Fragment{
     }
 
     private void initList(View v){
-        arrayImage = new ArrayList<>();
-        arrayLink = new ArrayList<>();
-        arrayTitle = new ArrayList<>();
+        comicsData = new ArrayList<>();
 
         mComicsList = (ListView)v.findViewById(R.id.listView);
-        adapter = new ComicsListAdapter(getActivity(), R.layout.list_item, arrayTitle, arrayImage);
+        adapter = new ComicsListAdapter(getActivity(), R.layout.list_item, comicsData);
         footer = getActivity().getLayoutInflater().inflate(R.layout.list_footer, null, false);
         footer.findViewById(R.id.footer).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,8 +72,8 @@ public class ComicsListFragment extends Fragment{
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), ComicsEpisodeActivity.class);
-                intent.putExtra("url", arrayLink.get(position));
-                intent.putExtra("title", arrayTitle.get(position));
+                intent.putExtra("url", comicsData.get(position).getLink());
+                intent.putExtra("title", comicsData.get(position).getTitle());
                 startActivity(intent);
             }
         });
@@ -110,15 +106,18 @@ public class ComicsListFragment extends Fragment{
 
                 int size = image.size();
                 Log.i("elementsSize", size + "");
+                ComicsData data;
                 for(int i = 0; i < size; i++){
                     temp = image.get(i).attr("style");
+                    data = new ComicsData();
                     if(temp.contains("http://marumaru.in"))
-                        arrayImage.add(temp.substring(21, temp.length()-1));
+                        data.setImage(temp.substring(21, temp.length()-1));
                     else
-                        arrayImage.add("http://marumaru.in" + temp.substring(21, temp.length()-1));
+                        data.setImage("http://marumaru.in" + temp.substring(21, temp.length()-1));
                     temp = link.get(i).attr("onclick");
-                    arrayLink.add(temp.substring(8, temp.length()-3));
-                    arrayTitle.add(title.get(i).text());
+                    data.setLink(temp.substring(8, temp.length()-3));
+                    data.setTitle(title.get(i).text());
+                    comicsData.add(data);
                 }
 
                 document = null;
@@ -136,8 +135,7 @@ public class ComicsListFragment extends Fragment{
         @Override
         protected void onPostExecute(Void mVoid) {
             dialog.dismiss();
-            adapter.addTitleArray(arrayTitle);
-            adapter.addImageArray(arrayImage);
+            adapter.addComicsData(comicsData);
             adapter.refresh();
         }
     }

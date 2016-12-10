@@ -20,24 +20,23 @@ public class ComicsListAdapter extends BaseAdapter {
     Context mContext;
     LayoutInflater inflater;
     int layout;
-    ArrayList<String> title, image;
+    ArrayList<ComicsData> comicsData;
 
-    public ComicsListAdapter(Context context, int layout, ArrayList<String> title, ArrayList<String> image) {
+    public ComicsListAdapter(Context context, int layout, ArrayList<ComicsData> comicsData) {
         this.mContext = context;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.layout = layout;
-        this.title = title;
-        this.image = image;
+        this.comicsData = comicsData;
     }
 
     @Override
     public int getCount() {
-        return title.size();
+        return comicsData.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return title.get(position);
+        return comicsData.get(position);
     }
 
     @Override
@@ -45,12 +44,8 @@ public class ComicsListAdapter extends BaseAdapter {
         return position;
     }
 
-    public void addTitleArray(ArrayList<String> title){
-        this.title = title;
-    }
-
-    public void addImageArray(ArrayList<String> image){
-        this.image = image;
+    public void addComicsData(ArrayList<ComicsData> comicsData){
+        this.comicsData = comicsData;
     }
 
     public void refresh(){
@@ -71,15 +66,15 @@ public class ComicsListAdapter extends BaseAdapter {
             holder = (ViewHolder)convertView.getTag();
         }
 
-        Glide.with(mContext).load(image.get(position)).into(holder.icon);
-        holder.title.setText(title.get(position));
+        Glide.with(mContext).load(comicsData.get(position).getImage()).into(holder.icon);
+        holder.title.setText(comicsData.get(position).getTitle());
 
         return convertView;
     }
 
     class ViewHolder{
-        public ImageView icon;
-        public TextView title;
+        ImageView icon;
+        TextView title;
     }
 }
 
