@@ -2,13 +2,12 @@ package ind.simsim.maruViewer;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,8 +17,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +32,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Created by admin on 2016-02-19.
@@ -138,10 +134,16 @@ public class ComicsEpisodeActivity extends Activity {
     }
 
     class Episode extends AsyncTask<Void, Void, Void> {
+        private ProgressDialog dialog;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            dialog = new ProgressDialog(mContext);
+            dialog.setTitle("Load");
+            dialog.setMessage("로딩중..");
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
         }
 
         @Override
@@ -175,6 +177,7 @@ public class ComicsEpisodeActivity extends Activity {
 
         @Override
         protected void onPostExecute(Void mVoid) {
+            dialog.dismiss();
             try {
                 bw.write(html.toString());
                 bw.flush();
@@ -182,71 +185,6 @@ public class ComicsEpisodeActivity extends Activity {
                 e.printStackTrace();
             }
             webView.loadUrl("file://" + path);
-        }
-    }
-
-    class Comics extends AsyncTask<String, Void, Void> {
-        private Elements image, title;
-        private StringBuilder html;
-        private String url;
-        private int size;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(String... params) {
-            url = params[0];
-            Log.d("url", url);
-            try {
-                Document document = Jsoup.connect(url).timeout(0).post();
-                image = document.select("img");
-                title = document.select("title");
-
-                html = new StringBuilder();
-                html.append(getResources().getString(R.string.htmlStart));
-
-                size = image.size();
-                int width = 0, height = 0;
-                Log.i("elementsSize", size + "");
-
-                for (int i = 0; i < size; i++) {
-                    if (image.get(i).attr("data-src").equals("")) {
-                        continue;
-                    }
-                    try {
-                        width = Integer.valueOf(image.get(i).attr("width"));
-                        height = Integer.valueOf(image.get(i).attr("height"));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        width = dWidth;
-                        height = dHeight;
-                    }
-                    height = (height * dWidth) / width;
-                    width = dWidth;
-                    Log.i("width", width + "");
-                    Log.i("height", height + "");
-                    html.append("<img src=").append(image.get(i).attr("data-src")).append(" width=").append(width).append(" height=").append(height).append("/> ");
-                }
-                html.append(getResources().getString(R.string.htmlEnd));
-
-                document = null;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void mVoid) {
-            intent = new Intent(mContext, ComicsViewer.class);
-            String title = this.title.get(0).text();
-            intent.putExtra("title", title.substring(0, title.length() - 12));
-            intent.putExtra("html", html.toString());
-            startActivity(intent);
         }
     }
 
@@ -259,7 +197,9 @@ public class ComicsEpisodeActivity extends Activity {
                     if (!url.contains("maru")) {
                         view.stopLoading();
                         view.goBack();
-                        new Comics().execute(url);
+                        intent  = new Intent(getApplicationContext(), ComicsViewer.class);
+                        intent.putExtra("url", url);
+                        startActivity(intent);
                     }
                     else{
                         intent = new Intent(getApplicationContext(), ComicsEpisodeActivity.class);

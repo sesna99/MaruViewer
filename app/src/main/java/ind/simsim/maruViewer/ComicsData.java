@@ -13,6 +13,11 @@ public class ComicsData {
     public ComicsData(){
     }
 
+    public ComicsData(String title, String link) {
+        this.title = title;
+        this.link = link;
+    }
+
     public ComicsData(String title, String image, String link) {
         this.title = title;
         this.image = image;

@@ -68,7 +68,6 @@ public class ComicsListFragment extends Fragment{
             @Override
             public void onRefresh(SwipyRefreshLayoutDirection swipyRefreshLayoutDirection) {
                 new ComicsList().execute();
-                swipyRefreshLayout.setRefreshing(false);
             }
         });
 
@@ -92,17 +91,19 @@ public class ComicsListFragment extends Fragment{
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog = new ProgressDialog(getActivity());
-            dialog.setTitle("Load");
-            dialog.setMessage("더 불러오는중..");
-            dialog.setCanceledOnTouchOutside(false);
-            dialog.show();
+            if(order ==1) {
+                dialog = new ProgressDialog(getActivity());
+                dialog.setTitle("Load");
+                dialog.setMessage("리스트 생성중..");
+                dialog.setCanceledOnTouchOutside(false);
+                dialog.show();
+            }
         }
 
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                Document document = Jsoup.connect(url + order++).timeout(0).get();
+                Document document = Jsoup.connect(url + order).timeout(0).get();
                 Elements image = document.select("div[class=image-thumb]");
                 Elements link = document.select("div div[class=list]");
                 Elements title = document.select("div div[class=sbj] span[class=subject]");
@@ -139,9 +140,11 @@ public class ComicsListFragment extends Fragment{
 
         @Override
         protected void onPostExecute(Void mVoid) {
-            dialog.dismiss();
+            if(order++ == 1)
+                dialog.dismiss();
             adapter.addComicsData(comicsData);
             adapter.refresh();
+            swipyRefreshLayout.setRefreshing(false);
         }
     }
 }
