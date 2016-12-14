@@ -1,4 +1,4 @@
-package ind.simsim.maruViewer;
+package ind.simsim.maruViewer.UI.Activity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -12,11 +12,18 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+
+import ind.simsim.maruViewer.Service.ComicsData;
+import ind.simsim.maruViewer.R;
+import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
 
 /**
  * Created by admin on 2016-02-18.
@@ -27,6 +34,8 @@ public class SearchFragment extends Fragment{
     private ArrayList<ComicsData> comicsDatas;
     private ComicsListAdapter adapter;
     private Bundle bundle;
+    private boolean isFirst = true;
+    private SwipyRefreshLayout layout;
 
     public SearchFragment() {
     }
@@ -42,6 +51,14 @@ public class SearchFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.list_fragment, container, false);
         initList(v);
+
+        layout = (SwipyRefreshLayout) v.findViewById(R.id.loadlist);
+        layout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh(SwipyRefreshLayoutDirection direction) {
+                layout.setRefreshing(false);
+            }
+        });
         return v;
     }
 
@@ -74,11 +91,13 @@ public class SearchFragment extends Fragment{
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog = new ProgressDialog(getActivity());
-            dialog.setTitle("Load");
-            dialog.setMessage("더 불러오는중..");
-            dialog.setCanceledOnTouchOutside(false);
-            dialog.show();
+            if(isFirst) {
+                dialog = new ProgressDialog(getActivity());
+                dialog.setTitle("Load");
+                dialog.setMessage("리스트 생성중..");
+                dialog.setCanceledOnTouchOutside(false);
+                dialog.show();
+            }
         }
 
         @Override

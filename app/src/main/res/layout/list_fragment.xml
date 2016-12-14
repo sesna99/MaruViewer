@@ -7,10 +7,9 @@
     android:background="#ffffff">
 
     <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
-        android:id="@+id/refreshlist"
+        android:id="@+id/loadlist"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:srl_direction="bottom">
+        android:layout_height="wrap_content">
 
         <ListView
             android:layout_width="match_parent"

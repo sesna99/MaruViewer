@@ -1,4 +1,4 @@
-package ind.simsim.maruViewer;
+package ind.simsim.maruViewer.UI.Activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -34,6 +33,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import ind.simsim.maruViewer.Service.ComicsData;
+import ind.simsim.maruViewer.Service.ComicsSave;
+import ind.simsim.maruViewer.R;
+import ind.simsim.maruViewer.Service.ApplicationController;
+
 /**
  * Created by admin on 2016-02-18.
  */
@@ -41,7 +45,7 @@ public class ComicsViewer extends Activity {
     private View mCustomView;
     private ActionBar actionBar;
     private ImageButton imageButton;
-    private String url;
+    private String comicsUrl, episodeUrl;
     private TextView titleView;
     private Intent intent;
     private File file;
@@ -54,6 +58,7 @@ public class ComicsViewer extends Activity {
     private int dWidth, dHeight;
     private ArrayList<ComicsData> comicsDatas;
     private SwipyRefreshLayout nextComics;
+    private boolean isFirst = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +67,8 @@ public class ComicsViewer extends Activity {
 
         context = this;
         intent = getIntent();
-        url = intent.getStringExtra("url");
+        comicsUrl = intent.getStringExtra("comicsUrl");
+        episodeUrl = intent.getStringExtra("episodeUrl");
         actionBar = getActionBar();
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
@@ -81,28 +87,26 @@ public class ComicsViewer extends Activity {
         titleView = (TextView) mCustomView.findViewById(R.id.title);
         titleView.setSelected(true);
 
+        comicsDatas = new ArrayList<>();
+
         nextComics = (SwipyRefreshLayout) findViewById(R.id.nextComics);
-        nextComics.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return false;
-            }
-        });
+        nextComics.setDirection(SwipyRefreshLayoutDirection.BOTTOM);
         nextComics.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh(SwipyRefreshLayoutDirection swipyRefreshLayoutDirection) {
-                new Comics().execute();
+                if(comicsDatas.size() > 0)
+                    loadNextComics();
+                else
+                    new Episode().execute();
             }
         });
-
-        comicsDatas = new ArrayList<>();
 
         final Activity activity = this;
         ImageButton save = (ImageButton) mCustomView.findViewById(R.id.save);
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new ComicsSave().save(activity, url);
+                new ComicsSave().save(activity, comicsUrl);
             }
         });
 
@@ -135,20 +139,21 @@ public class ComicsViewer extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog = new ProgressDialog(context);
-            dialog.setTitle("Load");
-            dialog.setMessage("로딩중..");
-            dialog.setCanceledOnTouchOutside(false);
-            dialog.show();
+            if(isFirst) {
+                dialog = new ProgressDialog(context);
+                dialog.setTitle("Load");
+                dialog.setMessage("로딩중..");
+                dialog.setCanceledOnTouchOutside(false);
+                dialog.show();
+            }
         }
 
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                Document document = Jsoup.connect(url).timeout(0).post();
+                Document document = Jsoup.connect(comicsUrl).timeout(0).post();
                 image = document.select("img");
                 title = document.select("title");
-                next = document.select("a[class*=next]");
 
                 html = new StringBuilder();
                 html.append(getResources().getString(R.string.htmlStart));
@@ -156,7 +161,6 @@ public class ComicsViewer extends Activity {
                 size = image.size();
                 int width = 0, height = 0;
                 Log.i("elementsSize", size + "");
-                Log.i("next", next.html());
                 for (int i = 0; i < size; i++) {
                     if (image.get(i).attr("data-src").equals("")) {
                         continue;
@@ -187,7 +191,10 @@ public class ComicsViewer extends Activity {
 
         @Override
         protected void onPostExecute(Void mVoid) {
-            dialog.dismiss();
+            if (isFirst) {
+                dialog.dismiss();
+                isFirst = false;
+            }
             path = getCacheDir() + "/maru.html";
             file = new File(path);
             try {
@@ -205,10 +212,6 @@ public class ComicsViewer extends Activity {
         }
     }
 
-    public void loadComics(){
-        webView.loadUrl("file://" + path);
-    }
-
     class Episode extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -219,7 +222,8 @@ public class ComicsViewer extends Activity {
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                Document document = Jsoup.connect(url).timeout(0).get();
+                Log.i("url", episodeUrl);
+                Document document = Jsoup.connect(episodeUrl).timeout(0).get();
                 Elements content = document.select("div[class=content] a");
 
                 int size = content.size();
@@ -227,6 +231,7 @@ public class ComicsViewer extends Activity {
                     if (!content.get(i).attr("href").equals("")) {
                         if(!content.get(i).attr("href").contains("http"))
                             break;
+                        Log.i("title", content.get(i).text());
                         comicsDatas.add(new ComicsData(content.get(i).text(), content.get(i).attr("href").replace("shencomics","yuncomics")));
                     }
                 }
@@ -241,13 +246,26 @@ public class ComicsViewer extends Activity {
 
         @Override
         protected void onPostExecute(Void mVoid) {
-            for(int i = 0; i < comicsDatas.size(); i++) {
-                if (titleView.getText().toString().equals(comicsDatas.get(i).getTitle())) {
-                    url = comicsDatas.get(i).getLink();
-                    break;
+            loadNextComics();
+        }
+    }
+
+    public void loadComics(){
+        webView.loadUrl("file://" + path);
+        webView.setScrollY(0);
+        nextComics.setRefreshing(false);
+    }
+
+    public void loadNextComics(){
+        for(int i = 0; i < comicsDatas.size(); i++) {
+            if (titleView.getText().toString().equals(comicsDatas.get(i).getTitle())) {
+                if(i + 1 < comicsDatas.size()) {
+                    Log.i("title", comicsDatas.get(i).getTitle());
+                    comicsUrl = comicsDatas.get(i + 1).getLink();
+                    new Comics().execute();
                 }
+                break;
             }
-            new Comics().execute();
         }
     }
 

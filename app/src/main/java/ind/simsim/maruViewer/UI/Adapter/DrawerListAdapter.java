@@ -1,4 +1,4 @@
-package ind.simsim.maruViewer;
+package ind.simsim.maruViewer.UI.Adapter;
 
 import android.content.Context;
 import android.view.View;
@@ -9,6 +9,8 @@ import android.widget.BaseAdapter;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import ind.simsim.maruViewer.R;
 
 /**
  * Created by admin on 2016-02-17.

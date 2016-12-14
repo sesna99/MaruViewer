@@ -1,5 +1,6 @@
-package ind.simsim.maruViewer;
+package ind.simsim.maruViewer.UI.Activity;
 
+import android.Manifest;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -9,7 +10,6 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +23,8 @@ import android.widget.Toast;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -32,13 +34,18 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+
+import ind.simsim.maruViewer.Service.ComicsSave;
+import ind.simsim.maruViewer.R;
+import ind.simsim.maruViewer.Service.ApplicationController;
 
 /**
  * Created by admin on 2016-02-19.
  */
 public class ComicsEpisodeActivity extends Activity {
     private Episode task;
-    private String url;
+    private String episodeUrl;
     private int dWidth, dHeight;
     private Intent intent;
     private Context mContext;
@@ -56,10 +63,8 @@ public class ComicsEpisodeActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comics_episode);
 
-        url = getIntent().getStringExtra("url");
-        url = url.contains("marumaru") ? url : "http://marumaru.in" + url;
-
-        Log.d("url", url);
+        episodeUrl = getIntent().getStringExtra("url");
+        episodeUrl = episodeUrl.contains("marumaru") ? episodeUrl : "http://marumaru.in" + episodeUrl;
 
         title = getIntent().getStringExtra("title");
 
@@ -89,7 +94,7 @@ public class ComicsEpisodeActivity extends Activity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new ComicsSave().save(activity, url);
+                new ComicsSave().save(activity, episodeUrl);
             }
         });
 
@@ -113,8 +118,26 @@ public class ComicsEpisodeActivity extends Activity {
         settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
 
-        task = new Episode();
-        task.execute();
+        PermissionListener permissionlistener = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+                task = new Episode();
+                task.execute();
+            }
+
+            @Override
+            public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+                Toast.makeText(ComicsEpisodeActivity.this, "권한을 허용해주세요.\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+            }
+
+
+        };
+
+        new TedPermission(this)
+                .setPermissionListener(permissionlistener)
+                .setDeniedMessage("이 서비스를 이용할려면 권한이 필요합니다.\n\n권한을 허용해주세요. [설정] > [권한]")
+                .setPermissions(Manifest.permission_group.STORAGE)
+                .check();
 
         Tracker t = ((ApplicationController)getApplication()).getTracker(ApplicationController.TrackerName.APP_TRACKER);
         t.setScreenName("ComicsEpisodeActivity");
@@ -149,7 +172,7 @@ public class ComicsEpisodeActivity extends Activity {
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                Document document = Jsoup.connect(url).timeout(0).get();
+                Document document = Jsoup.connect(episodeUrl).timeout(0).get();
                 Elements image = document.select("div img[src*=quickimage]");
                 Elements content = document.select("div[class=content] a");
                 html = new StringBuilder();
@@ -164,6 +187,7 @@ public class ComicsEpisodeActivity extends Activity {
                         html.append("<div align=\"center\" style=\"line-height: 19.2px;\"><a target=\"_blank\" href=\"").append(content.get(i).attr("href").replace("shencomics","yuncomics")).append("\" target=\"_self\"><font color=\"#717171\" style=\"color: rgb(113, 113, 113); text-decoration: none;\"><span style=\"font-size: 18.6667px; line-height: 19.2px;\">").append(content.get(i).text()).append("</span></font></a></div><br>");
                     }
                 }
+
 
                 html.append("</div></body></html>");
 
@@ -198,7 +222,8 @@ public class ComicsEpisodeActivity extends Activity {
                         view.stopLoading();
                         view.goBack();
                         intent  = new Intent(getApplicationContext(), ComicsViewer.class);
-                        intent.putExtra("url", url);
+                        intent.putExtra("comicsUrl", url);
+                        intent.putExtra("episodeUrl", episodeUrl);
                         startActivity(intent);
                     }
                     else{

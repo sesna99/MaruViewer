@@ -1,4 +1,4 @@
-package ind.simsim.maruViewer;
+package ind.simsim.maruViewer.UI.Adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,6 +11,9 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+
+import ind.simsim.maruViewer.Service.ComicsData;
+import ind.simsim.maruViewer.R;
 
 /**
  * Created by admin on 2016-02-15.

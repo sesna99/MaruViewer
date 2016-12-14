@@ -1,4 +1,4 @@
-package ind.simsim.maruViewer;
+package ind.simsim.maruViewer.Service;
 
 /**
  * Created by jack on 2016. 12. 8..

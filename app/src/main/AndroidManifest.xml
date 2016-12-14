@@ -8,13 +8,13 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:name=".ApplicationController"
+        android:name=".Service.ApplicationController"
         android:allowBackup="true"
         android:label="@string/app_name"
         android:icon="@drawable/ic_launcher"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity" >
+            android:name=".UI.Activity.MainActivity" >
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,8 +26,8 @@
                 android:value=".SearchResultsActivity" />
         </activity>
 
-        <activity android:name="ind.simsim.maruViewer.ComicsViewer"></activity>
-        <activity android:name="ind.simsim.maruViewer.ComicsEpisodeActivity"></activity>
+        <activity android:name="ind.simsim.maruViewer.UI.Activity.ComicsViewer"></activity>
+        <activity android:name="ind.simsim.maruViewer.UI.Activity.ComicsEpisodeActivity"></activity>
 
 
         <meta-data android:name="com.google.android.gms.version"

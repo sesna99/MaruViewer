@@ -1,4 +1,4 @@
-package ind.simsim.maruViewer;
+package ind.simsim.maruViewer.UI.Activity;
 
 import android.app.ActionBar;
 import android.app.AlertDialog;
@@ -26,6 +26,10 @@ import com.ikimuhendis.ldrawer.ActionBarDrawerToggle;
 import com.ikimuhendis.ldrawer.DrawerArrowDrawable;
 
 import java.util.ArrayList;
+
+import ind.simsim.maruViewer.R;
+import ind.simsim.maruViewer.Service.ApplicationController;
+import ind.simsim.maruViewer.UI.Adapter.DrawerListAdapter;
 
 
 public class MainActivity extends FragmentActivity {

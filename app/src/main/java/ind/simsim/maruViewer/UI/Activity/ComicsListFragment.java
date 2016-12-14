@@ -1,4 +1,4 @@
-package ind.simsim.maruViewer;
+package ind.simsim.maruViewer.UI.Activity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -21,6 +22,10 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 
+import ind.simsim.maruViewer.Service.ComicsData;
+import ind.simsim.maruViewer.R;
+import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
+
 /**
  * Created by admin on 2016-02-18.
  */
@@ -32,7 +37,9 @@ public class ComicsListFragment extends Fragment{
     private View footer;
     private int order = 1;
     private Bundle bundle;
-    private SwipyRefreshLayout swipyRefreshLayout;
+    private SwipyRefreshLayout load;
+    private boolean isFirst = true;
+    private float oldY = 0, curY = 0;
 
     public ComicsListFragment() {
     }
@@ -63,10 +70,14 @@ public class ComicsListFragment extends Fragment{
         mComicsList = (ListView)v.findViewById(R.id.listView);
         adapter = new ComicsListAdapter(getActivity(), R.layout.list_item, comicsData);
 
-        swipyRefreshLayout = (SwipyRefreshLayout)v.findViewById(R.id.refreshlist);
-        swipyRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
+        load = (SwipyRefreshLayout)v.findViewById(R.id.loadlist);
+        load.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh(SwipyRefreshLayoutDirection swipyRefreshLayoutDirection) {
+                if(load.getDirection() == SwipyRefreshLayoutDirection.TOP) {
+                    order = 1;
+                    comicsData = new ArrayList<>();
+                }
                 new ComicsList().execute();
             }
         });
@@ -82,6 +93,29 @@ public class ComicsListFragment extends Fragment{
             }
         });
 
+        mComicsList.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                switch (motionEvent.getAction()){
+                    case MotionEvent.ACTION_MOVE:
+                        if(oldY == 0) {
+                            oldY = motionEvent.getRawY();
+                        }
+                        curY = motionEvent.getRawY();
+                        if(curY > oldY)
+                            load.setDirection(SwipyRefreshLayoutDirection.TOP);
+                        else
+                            load.setDirection(SwipyRefreshLayoutDirection.BOTTOM);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        oldY = 0;
+                        curY = 0;
+                        break;
+                }
+                return false;
+            }
+        });
+
         new ComicsList().execute();
     }
 
@@ -91,7 +125,7 @@ public class ComicsListFragment extends Fragment{
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            if(order ==1) {
+            if(isFirst) {
                 dialog = new ProgressDialog(getActivity());
                 dialog.setTitle("Load");
                 dialog.setMessage("리스트 생성중..");
@@ -103,7 +137,7 @@ public class ComicsListFragment extends Fragment{
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                Document document = Jsoup.connect(url + order).timeout(0).get();
+                Document document = Jsoup.connect(url + order++).timeout(0).get();
                 Elements image = document.select("div[class=image-thumb]");
                 Elements link = document.select("div div[class=list]");
                 Elements title = document.select("div div[class=sbj] span[class=subject]");
@@ -140,11 +174,13 @@ public class ComicsListFragment extends Fragment{
 
         @Override
         protected void onPostExecute(Void mVoid) {
-            if(order++ == 1)
+            if(isFirst) {
                 dialog.dismiss();
+                isFirst = false;
+            }
             adapter.addComicsData(comicsData);
             adapter.refresh();
-            swipyRefreshLayout.setRefreshing(false);
+            load.setRefreshing(false);
         }
     }
 }
