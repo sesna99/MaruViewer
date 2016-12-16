@@ -9,13 +9,13 @@
     <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
         android:id="@+id/loadlist"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:srl_direction="top">
 
         <ListView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/listView"
-            android:background="@drawable/border"
             android:divider="#e1efff"
             android:dividerHeight="2dp"
             android:layout_gravity="center_horizontal" />

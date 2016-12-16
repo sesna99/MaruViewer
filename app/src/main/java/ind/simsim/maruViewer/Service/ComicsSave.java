@@ -105,6 +105,8 @@ public class ComicsSave {
                     if (!content.get(i).attr("href").equals("")) {
                         if (!content.get(i).attr("href").contains("http"))
                             break;
+                        if(content.get(i).text().equals(""))
+                            continue;
                         data = new ComicsData();
                         data.setTitle(content.get(i).text());
                         data.setLink(content.get(i).attr("href").replace("shencomics", "yuncomics"));
@@ -132,8 +134,6 @@ public class ComicsSave {
     class Comics extends AsyncTask<ArrayList<ComicsData>, Void, Void> {
         private Elements image, title;
         private int size;
-        private int dWidth, dHeight;
-        private DisplayMetrics dm;
         private ArrayList<ComicsData> saveData;
         private ArrayList<ArrayList<ComicsData>> dataArray;
         private Document document;
@@ -152,9 +152,6 @@ public class ComicsSave {
         @Override
         protected Void doInBackground(ArrayList<ComicsData>... params) {
             saveData = params[0];
-            dm = activity.getApplicationContext().getResources().getDisplayMetrics();
-            dWidth = dm.widthPixels;
-            dHeight = dm.heightPixels / 2;
             dataArray = new ArrayList<>();
             ComicsData data;
             ArrayList<ComicsData> datas;
@@ -166,23 +163,12 @@ public class ComicsSave {
                     title = document.select("title");
 
                     size = image.size();
-                    int width = 0, height = 0;
-                    Log.i("elementsSize", size + "");
 
                     datas = new ArrayList<>();
                     for (int j = 0; j < size; j++) {
                         if (image.get(j).attr("data-src").equals("")) {
                             continue;
                         }
-                        try {
-                            width = Integer.valueOf(image.get(i).attr("width"));
-                            height = Integer.valueOf(image.get(i).attr("height"));
-                        } catch (Exception e) {
-                            width = dWidth;
-                            height = dHeight;
-                        }
-                        height = (height * dWidth) / width;
-                        width = dWidth;
                         data = new ComicsData();
                         data.setTitle(saveData.get(i).getTitle());
                         data.setImageName(j + ".jpg");
@@ -217,14 +203,12 @@ public class ComicsSave {
             super.onPreExecute();
 
             nm = (NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
-            PendingIntent pendingIntent = PendingIntent.getActivity(activity, 0, new Intent(activity, activity.getClass()), PendingIntent.FLAG_UPDATE_CURRENT);
 
             mBuilder = new Notification.Builder(activity);
             mBuilder.setSmallIcon(R.drawable.ic_launcher);
             mBuilder.setTicker("다운로드중...");
             mBuilder.setWhen(System.currentTimeMillis());
             mBuilder.setContentTitle("마루뷰어");
-            mBuilder.setContentIntent(pendingIntent);
             mBuilder.setAutoCancel(true);
             mBuilder.setOngoing(true);
 

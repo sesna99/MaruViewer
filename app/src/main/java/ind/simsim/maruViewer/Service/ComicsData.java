@@ -9,6 +9,8 @@ public class ComicsData {
     private String image;
     private String imageName;
     private String link;
+    private String comicsUrl;
+    private String episodeUrl;
 
     public ComicsData(){
     }
@@ -22,6 +24,13 @@ public class ComicsData {
         this.title = title;
         this.image = image;
         this.link = link;
+    }
+
+    public ComicsData(String title, String image, String comicsUrl, String episodeUrl) {
+        this.title = title;
+        this.image = image;
+        this.comicsUrl = comicsUrl;
+        this.episodeUrl = episodeUrl;
     }
 
     public String getTitle() {
@@ -54,5 +63,21 @@ public class ComicsData {
 
     public void setImageName(String imageName) {
         this.imageName = imageName;
+    }
+
+    public String getComicsUrl() {
+        return comicsUrl;
+    }
+
+    public void setComicsUrl(String comicsUrl) {
+        this.comicsUrl = comicsUrl;
+    }
+
+    public String getEpisodeUrl() {
+        return episodeUrl;
+    }
+
+    public void setEpisodeUrl(String episodeUrl) {
+        this.episodeUrl = episodeUrl;
     }
 }

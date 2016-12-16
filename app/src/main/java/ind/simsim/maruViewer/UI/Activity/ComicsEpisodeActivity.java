@@ -1,6 +1,5 @@
 package ind.simsim.maruViewer.UI.Activity;
 
-import android.Manifest;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -23,8 +22,6 @@ import android.widget.Toast;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.gun0912.tedpermission.PermissionListener;
-import com.gun0912.tedpermission.TedPermission;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -34,11 +31,12 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 
-import ind.simsim.maruViewer.Service.ComicsSave;
 import ind.simsim.maruViewer.R;
 import ind.simsim.maruViewer.Service.ApplicationController;
+import ind.simsim.maruViewer.Service.ComicsData;
+import ind.simsim.maruViewer.Service.ComicsSave;
+import ind.simsim.maruViewer.Service.PreferencesManager;
 
 /**
  * Created by admin on 2016-02-19.
@@ -57,6 +55,10 @@ public class ComicsEpisodeActivity extends Activity {
     private String path;
     private StringBuilder html;
     private String title;
+    private PreferencesManager pm;
+    private ImageButton save, favorite;
+    private TextView titleView;
+    private String imageUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,19 +86,40 @@ public class ComicsEpisodeActivity extends Activity {
             }
         });
 
-        TextView titleView = (TextView) mCustomView.findViewById(R.id.title);
+        titleView = (TextView) mCustomView.findViewById(R.id.title);
         titleView.setText(title);
         titleView.setSelected(true);
 
+        pm = PreferencesManager.getInstance(getApplicationContext());
+
         final Activity activity = this;
 
-        ImageButton save = (ImageButton) mCustomView.findViewById(R.id.save);
+        save = (ImageButton) mCustomView.findViewById(R.id.save);
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 new ComicsSave().save(activity, episodeUrl);
             }
         });
+
+        favorite = (ImageButton) mCustomView.findViewById(R.id.favorite);
+        favorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(pm.searchFavorites("e", episodeUrl)){
+                    pm.deleteFavorites(pm.getFavoritesPosition("e", episodeUrl));
+                    favorite.setBackgroundResource(R.drawable.star3);
+                }
+                else {
+                    pm.setFavorites(new ComicsData(title, imageUrl, "", episodeUrl), "e");
+                    favorite.setBackgroundResource(R.drawable.star4);
+                }
+            }
+        });
+
+        if(pm.searchFavorites("e", episodeUrl)){
+            favorite.setBackgroundResource(R.drawable.star4);
+        }
 
         path = getCacheDir() + "/episode.html";
         file = new File(path);
@@ -118,26 +141,8 @@ public class ComicsEpisodeActivity extends Activity {
         settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
 
-        PermissionListener permissionlistener = new PermissionListener() {
-            @Override
-            public void onPermissionGranted() {
-                task = new Episode();
-                task.execute();
-            }
-
-            @Override
-            public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-                Toast.makeText(ComicsEpisodeActivity.this, "권한을 허용해주세요.\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
-            }
-
-
-        };
-
-        new TedPermission(this)
-                .setPermissionListener(permissionlistener)
-                .setDeniedMessage("이 서비스를 이용할려면 권한이 필요합니다.\n\n권한을 허용해주세요. [설정] > [권한]")
-                .setPermissions(Manifest.permission_group.STORAGE)
-                .check();
+        task = new ComicsEpisodeActivity.Episode();
+        task.execute();
 
         Tracker t = ((ApplicationController)getApplication()).getTracker(ApplicationController.TrackerName.APP_TRACKER);
         t.setScreenName("ComicsEpisodeActivity");
@@ -178,6 +183,7 @@ public class ComicsEpisodeActivity extends Activity {
                 html = new StringBuilder();
                 html.append("<html><body><div style=\"text-align: center\"><img src=\"").append(image.attr("src")).append("\" width=").append(dWidth / 3.5).append(" height=").append(dHeight / 2.5).append("></div><br>");
                 html.append("<div align=\"center\" style=\"color: rgb(0, 0, 0); font-family: dotum; font-size: 12px; line-height: 19.2px; text-align: center;\"><br>");
+                imageUrl = image.attr("src");
 
                 int size = content.size();
                 for (int i = 0; i < size; i++) {

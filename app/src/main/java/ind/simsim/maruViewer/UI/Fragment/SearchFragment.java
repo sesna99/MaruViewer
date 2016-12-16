@@ -1,11 +1,10 @@
-package ind.simsim.maruViewer.UI.Activity;
+package ind.simsim.maruViewer.UI.Fragment;
 
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,14 +20,15 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 
-import ind.simsim.maruViewer.Service.ComicsData;
 import ind.simsim.maruViewer.R;
+import ind.simsim.maruViewer.Service.ComicsData;
+import ind.simsim.maruViewer.UI.Activity.ComicsEpisodeActivity;
 import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
 
 /**
  * Created by admin on 2016-02-18.
  */
-public class SearchFragment extends Fragment{
+public class SearchFragment extends Fragment {
     private ListView mComicsList;
     private String url;
     private ArrayList<ComicsData> comicsDatas;
@@ -109,8 +109,6 @@ public class SearchFragment extends Fragment{
                 Elements title = document.select("div[class=sbjbox] b");
 
                 int size = image.size();
-                Log.i("url", url);
-                Log.i("elementsSize", size + "");
 
                 ComicsData data;
                 for(int i = 0; i < size; i++){
@@ -135,7 +133,7 @@ public class SearchFragment extends Fragment{
         @Override
         protected void onPostExecute(Void mVoid) {
             dialog.dismiss();
-            adapter.addComicsData(comicsDatas);
+            adapter.setComicsData(comicsDatas);
             adapter.refresh();
         }
     }

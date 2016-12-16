@@ -36,8 +36,16 @@
         android:layout_width="22dp"
         android:layout_height="20dp"
         android:layout_gravity="center"
+        android:id="@+id/favorite"
+        android:layout_marginRight="15dp"
+        android:background="@drawable/star3"/>
+
+    <ImageButton
+        android:layout_width="22dp"
+        android:layout_height="20dp"
+        android:layout_gravity="center"
         android:id="@+id/save"
         android:layout_marginRight="15dp"
-        android:background="@drawable/save"/>
+        android:background="@drawable/save3"/>
 
 </LinearLayout>

@@ -1,6 +1,7 @@
 package ind.simsim.maruViewer.UI.Adapter;
 
 import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,16 +11,16 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.io.File;
 import java.util.ArrayList;
 
-import ind.simsim.maruViewer.Service.ComicsData;
 import ind.simsim.maruViewer.R;
+import ind.simsim.maruViewer.Service.ComicsData;
 
 /**
  * Created by admin on 2016-02-15.
  */
 public class ComicsListAdapter extends BaseAdapter {
-
     Context mContext;
     LayoutInflater inflater;
     int layout;
@@ -47,8 +48,9 @@ public class ComicsListAdapter extends BaseAdapter {
         return position;
     }
 
-    public void addComicsData(ArrayList<ComicsData> comicsData){
+    public void setComicsData(ArrayList<ComicsData> comicsData){
         this.comicsData = comicsData;
+        notifyDataSetChanged();
     }
 
     public void refresh(){
@@ -69,7 +71,10 @@ public class ComicsListAdapter extends BaseAdapter {
             holder = (ViewHolder)convertView.getTag();
         }
 
-        Glide.with(mContext).load(comicsData.get(position).getImage()).into(holder.icon);
+        if(comicsData.get(position).getImage().contains("storage"))
+            Glide.with(mContext).load(Uri.fromFile(new File(comicsData.get(position).getImage()))).into(holder.icon);
+        else
+            Glide.with(mContext).load(comicsData.get(position).getImage()).into(holder.icon);
         holder.title.setText(comicsData.get(position).getTitle());
 
         return convertView;

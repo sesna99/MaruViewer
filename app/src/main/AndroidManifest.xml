@@ -26,6 +26,7 @@
                 android:value=".SearchResultsActivity" />
         </activity>
 
+        <activity android:name="ind.simsim.maruViewer.UI.Activity.ComicsListActivity"></activity>
         <activity android:name="ind.simsim.maruViewer.UI.Activity.ComicsViewer"></activity>
         <activity android:name="ind.simsim.maruViewer.UI.Activity.ComicsEpisodeActivity"></activity>
 

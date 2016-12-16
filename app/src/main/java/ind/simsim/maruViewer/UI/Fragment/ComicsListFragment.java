@@ -1,11 +1,10 @@
-package ind.simsim.maruViewer.UI.Activity;
+package ind.simsim.maruViewer.UI.Fragment;
 
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,14 +21,15 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 
-import ind.simsim.maruViewer.Service.ComicsData;
 import ind.simsim.maruViewer.R;
+import ind.simsim.maruViewer.Service.ComicsData;
+import ind.simsim.maruViewer.UI.Activity.ComicsEpisodeActivity;
 import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
 
 /**
  * Created by admin on 2016-02-18.
  */
-public class ComicsListFragment extends Fragment{
+public class ComicsListFragment extends Fragment {
     private ListView mComicsList;
     private String url;
     private ArrayList<ComicsData> comicsData;
@@ -145,7 +145,6 @@ public class ComicsListFragment extends Fragment{
                 String temp;
 
                 int size = image.size();
-                Log.i("elementsSize", size + "");
                 ComicsData data;
                 for(int i = 0; i < size; i++){
                     temp = image.get(i).attr("style");
@@ -178,7 +177,7 @@ public class ComicsListFragment extends Fragment{
                 dialog.dismiss();
                 isFirst = false;
             }
-            adapter.addComicsData(comicsData);
+            adapter.setComicsData(comicsData);
             adapter.refresh();
             load.setRefreshing(false);
         }

@@ -1,15 +1,14 @@
 package ind.simsim.maruViewer.UI.Activity;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,8 +16,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.Toast;
 
+import com.flyco.tablayout.CommonTabLayout;
+import com.flyco.tablayout.listener.CustomTabEntity;
+import com.flyco.tablayout.listener.OnTabSelectListener;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -29,31 +30,37 @@ import java.util.ArrayList;
 
 import ind.simsim.maruViewer.R;
 import ind.simsim.maruViewer.Service.ApplicationController;
+import ind.simsim.maruViewer.Service.TabEntity;
 import ind.simsim.maruViewer.UI.Adapter.DrawerListAdapter;
+import ind.simsim.maruViewer.UI.Adapter.PageAdapter;
 
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends Activity {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
-    private View header;
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerArrowDrawable drawerArrow;
-    private Fragment fragment;
-    private ArrayList<Fragment> fragmentArray;
-    private Bundle bundle;
     private MenuItem searchMenu;
+    private ViewPager mViewPager;
+    private PageAdapter adapter;
+    private ActionBar actionBar;
+    private CommonTabLayout tabLayout;
+    private ArrayList<CustomTabEntity> tabEntities;
+    private String[] title = {"업데이트", "다운로드", "즐겨찾기", "최근본만화", "설정"};
+    private int[] selectImg = {R.drawable.new1, R.drawable.save1, R.drawable.star1, R.drawable.lately1, R.drawable.settings1};
+    private int[] unselectImg = {R.drawable.new2, R.drawable.save2, R.drawable.star2, R.drawable.lately2, R.drawable.settings2};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ActionBar ab = getActionBar();
-        ab.setDisplayShowTitleEnabled(false);
-        ab.setDisplayHomeAsUpEnabled(true);
-        ab.setHomeButtonEnabled(true);
+        actionBar = getActionBar();
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
 
         initDrawer();
-        initFragment();
+        init();
 
         Tracker t = ((ApplicationController)getApplication()).getTracker(ApplicationController.TrackerName.APP_TRACKER);
         t.setScreenName("MainAcitivty");
@@ -75,7 +82,6 @@ public class MainActivity extends FragmentActivity {
     private void initDrawer(){
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.navdrawer);
-        header = getLayoutInflater().inflate(R.layout.drawer_list_header, null, false);
 
         drawerArrow = new DrawerArrowDrawable(this) {
             @Override
@@ -109,14 +115,6 @@ public class MainActivity extends FragmentActivity {
                 R.layout.drawer_list_item, R.id.text1,
                 new String[]{"17", "SF", "TS", "개그", "드라마", "러브코미디", "먹방", "백합", "붕탁", "순정", "스릴러", "스포츠", "시대", "액션", "일상 치유", "추리", "판타지", "학원", "호러"}));
 
-        //mDrawerList.addHeaderView(header);
-        header.findViewById(R.id.bookMark).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "mark", Toast.LENGTH_SHORT).show();
-            }
-        });
-
         mDrawerList.setAdapter(adapter);
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -135,21 +133,47 @@ public class MainActivity extends FragmentActivity {
         });
     }
 
-    private void initFragment(){
-        fragmentArray = new ArrayList<>();
-        String[] url = getResources().getStringArray(R.array.url);
-        for(String temp : url){
-            fragment = new ComicsListFragment();
-            bundle = new Bundle();
-            bundle.putString("url", temp);
-            Log.i("url", temp);
-            fragment.setArguments(bundle);
-            fragmentArray.add(fragment);
-        }
+    private void init(){
+        initDrawer();
+        adapter = new PageAdapter(getApplicationContext(), getFragmentManager(), 5);
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setAdapter(adapter);
 
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment, fragmentArray.get(1));
-        transaction.commit();
+        tabEntities = new ArrayList<>();
+        for(int i = 0; i < selectImg.length; i++)
+            tabEntities.add(new TabEntity(title[i], selectImg[i], unselectImg[i]));
+
+        tabLayout = (CommonTabLayout) findViewById(R.id.tabs);
+        tabLayout.setTabData(tabEntities);
+
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                tabLayout.setCurrentTab(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        tabLayout.setOnTabSelectListener(new OnTabSelectListener() {
+            @Override
+            public void onTabSelect(int position) {
+                mViewPager.setCurrentItem(position);
+            }
+
+            @Override
+            public void onTabReselect(int position) {
+
+            }
+        });
     }
 
 
@@ -184,12 +208,27 @@ public class MainActivity extends FragmentActivity {
         if (mDrawerLayout != null) {
             mDrawerLayout.closeDrawer(mDrawerList);
         }
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if(position > 15)
-            transaction.replace(R.id.fragment, fragmentArray.get(position - 2));
-        else
-            transaction.replace(R.id.fragment, fragmentArray.get(position - 1));
-        transaction.commit();
+        //FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if(position > 15) {
+            Intent intent = new Intent(this, ComicsListActivity.class);
+            intent.putExtra("position", position - 2);
+            startActivity(intent);
+            //transaction.replace(R.id.fragment, fragmentArray.get(position - 1));
+        }
+        else {
+            if(position != 2) {
+                Intent intent = new Intent(this, ComicsListActivity.class);
+                intent.putExtra("position", position - 1);
+                startActivity(intent);
+            }
+            else{
+                mViewPager.setCurrentItem(0);
+                tabLayout.setCurrentTab(0);
+            }
+            //transaction.replace(R.id.fragment, fragmentArray.get(position - 2));
+        }
+
+        //transaction.commit();
     }
 
     @Override
@@ -202,13 +241,19 @@ public class MainActivity extends FragmentActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
-                bundle = new Bundle();
+                /*bundle = new Bundle();
                 bundle.putString("url", getString(R.string.search, s));
                 fragment = new SearchFragment();
-                fragment.setArguments(bundle);
+                fragment.setArguments(bundle);*/
+                Intent intent = new Intent(MainActivity.this, ComicsListActivity.class);
+                intent.putExtra("position", -1);
+                intent.putExtra("url", getString(R.string.search, s));
+                startActivity(intent);
+                /*
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.fragment, fragment);
                 transaction.commit();
+                */
                 searchMenu.collapseActionView();
                 return false;
             }
@@ -242,22 +287,5 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        clearApplicationCache(null);
-    }
-
-    private void clearApplicationCache(java.io.File dir){
-        if(dir==null)
-            dir = getCacheDir();
-        else;
-        if(dir==null)
-            return;
-        else ;
-        java.io.File[] children = dir.listFiles();
-        try {
-            for (int i = 0; i < children.length; i++)
-                if (children[i].isDirectory())
-                    clearApplicationCache(children[i]);
-                else children[i].delete();
-        } catch(Exception e){}
     }
 }

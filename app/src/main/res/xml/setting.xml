@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+        android:key="path"
+        android:title="다운로드 디렉토리"
+        android:enabled="false"/>
+
+    <Preference
+        android:key="cache"
+        android:title="캐시 초기화"/>
+
+    <Preference
+        android:key="lately"
+        android:title="최근본만화 초기화"/>
+
+    <Preference
+        android:key="update"
+        android:title="업데이트 확인"
+        android:summary="현재 버전 : 3.0"/>
+
+</PreferenceScreen>
