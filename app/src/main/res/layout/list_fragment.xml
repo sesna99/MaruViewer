@@ -10,7 +10,7 @@
         android:id="@+id/loadlist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srl_direction="top">
+        app:srl_direction="both">
 
         <ListView
             android:layout_width="match_parent"

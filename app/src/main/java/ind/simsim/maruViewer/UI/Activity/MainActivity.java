@@ -1,5 +1,6 @@
 package ind.simsim.maruViewer.UI.Activity;
 
+import android.Manifest;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -16,20 +17,19 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.flyco.tablayout.CommonTabLayout;
 import com.flyco.tablayout.listener.CustomTabEntity;
 import com.flyco.tablayout.listener.OnTabSelectListener;
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
 import com.ikimuhendis.ldrawer.ActionBarDrawerToggle;
 import com.ikimuhendis.ldrawer.DrawerArrowDrawable;
 
 import java.util.ArrayList;
 
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Service.ApplicationController;
 import ind.simsim.maruViewer.Service.TabEntity;
 import ind.simsim.maruViewer.UI.Adapter.DrawerListAdapter;
 import ind.simsim.maruViewer.UI.Adapter.PageAdapter;
@@ -60,23 +60,35 @@ public class MainActivity extends Activity {
         actionBar.setHomeButtonEnabled(true);
 
         initDrawer();
-        init();
 
-        Tracker t = ((ApplicationController)getApplication()).getTracker(ApplicationController.TrackerName.APP_TRACKER);
-        t.setScreenName("MainAcitivty");
-        t.send(new HitBuilders.AppViewBuilder().build());
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        GoogleAnalytics.getInstance(this).reportActivityStart(this);
+        PermissionListener permissionlistener = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+                init();
+            }
+
+            @Override
+            public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+                Toast.makeText(getApplicationContext(), "권한을 허용해주세요.\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+            }
+
+        };
+
+        new TedPermission(getApplicationContext())
+                .setPermissionListener(permissionlistener)
+                .setDeniedMessage("이 서비스를 이용할려면 권한이 필요합니다.\n\n권한을 허용해주세요. [설정] > [권한]")
+                .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .check();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
 
     private void initDrawer(){

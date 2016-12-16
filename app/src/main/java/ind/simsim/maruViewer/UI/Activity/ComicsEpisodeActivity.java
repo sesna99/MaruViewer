@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,10 +20,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -31,9 +28,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Service.ApplicationController;
 import ind.simsim.maruViewer.Service.ComicsData;
 import ind.simsim.maruViewer.Service.ComicsSave;
 import ind.simsim.maruViewer.Service.PreferencesManager;
@@ -59,6 +56,7 @@ public class ComicsEpisodeActivity extends Activity {
     private ImageButton save, favorite;
     private TextView titleView;
     private String imageUrl;
+    private ArrayList<String> episode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,21 +142,16 @@ public class ComicsEpisodeActivity extends Activity {
         task = new ComicsEpisodeActivity.Episode();
         task.execute();
 
-        Tracker t = ((ApplicationController)getApplication()).getTracker(ApplicationController.TrackerName.APP_TRACKER);
-        t.setScreenName("ComicsEpisodeActivity");
-        t.send(new HitBuilders.AppViewBuilder().build());
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        GoogleAnalytics.getInstance(this).reportActivityStart(this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
 
     class Episode extends AsyncTask<Void, Void, Void> {
@@ -184,6 +177,7 @@ public class ComicsEpisodeActivity extends Activity {
                 html.append("<html><body><div style=\"text-align: center\"><img src=\"").append(image.attr("src")).append("\" width=").append(dWidth / 3.5).append(" height=").append(dHeight / 2.5).append("></div><br>");
                 html.append("<div align=\"center\" style=\"color: rgb(0, 0, 0); font-family: dotum; font-size: 12px; line-height: 19.2px; text-align: center;\"><br>");
                 imageUrl = image.attr("src");
+                episode = new ArrayList<>();
 
                 int size = content.size();
                 for (int i = 0; i < size; i++) {
@@ -191,6 +185,7 @@ public class ComicsEpisodeActivity extends Activity {
                         if(!content.get(i).attr("href").contains("http"))
                             break;
                         html.append("<div align=\"center\" style=\"line-height: 19.2px;\"><a target=\"_blank\" href=\"").append(content.get(i).attr("href").replace("shencomics","yuncomics")).append("\" target=\"_self\"><font color=\"#717171\" style=\"color: rgb(113, 113, 113); text-decoration: none;\"><span style=\"font-size: 18.6667px; line-height: 19.2px;\">").append(content.get(i).text()).append("</span></font></a></div><br>");
+                        episode.add(content.get(i).text());
                     }
                 }
 

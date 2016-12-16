@@ -34,7 +34,6 @@ public class ComicsListFragment extends Fragment {
     private String url;
     private ArrayList<ComicsData> comicsData;
     private ComicsListAdapter adapter;
-    private View footer;
     private int order = 1;
     private Bundle bundle;
     private SwipyRefreshLayout load;
@@ -93,7 +92,7 @@ public class ComicsListFragment extends Fragment {
             }
         });
 
-        mComicsList.setOnTouchListener(new View.OnTouchListener() {
+       /* mComicsList.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()){
@@ -114,7 +113,7 @@ public class ComicsListFragment extends Fragment {
                 }
                 return false;
             }
-        });
+        });*/
 
         new ComicsList().execute();
     }

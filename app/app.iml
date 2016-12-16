@@ -66,14 +66,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/jni" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/rs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/shaders" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/res" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/resources" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/assets" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/aidl" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/jni" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/rs" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/shaders" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/res" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/assets" type="java-test-resource" />
@@ -82,6 +74,14 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/jni" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/rs" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/shaders" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/res" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/resources" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/assets" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/aidl" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/jni" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/rs" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/shaders" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/build/.DS_Store" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/assets" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/blame" />
@@ -99,7 +99,6 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.flyco.tablayout/FlycoTabLayout_Lib/2.0.6/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.dmytrodanylyk.android-process-button/library/1.0.4/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.orangegangsters/swipy/1.2.3/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.gms/play-services/6.5.87/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.ikimuhendis/ldrawer/0.1/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/gun0912.ted/tedpermission/1.0.2/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
@@ -127,7 +126,6 @@
     <orderEntry type="library" exported="" name="support-annotations-25.0.1" level="project" />
     <orderEntry type="library" exported="" name="swipy-1.2.3" level="project" />
     <orderEntry type="library" exported="" name="jsoup-1.8.3" level="project" />
-    <orderEntry type="library" exported="" name="play-services-6.5.87" level="project" />
     <orderEntry type="library" exported="" name="support-compat-25.0.1" level="project" />
     <orderEntry type="library" exported="" name="support-fragment-25.0.1" level="project" />
     <orderEntry type="library" exported="" name="support-v4-25.0.1" level="project" />

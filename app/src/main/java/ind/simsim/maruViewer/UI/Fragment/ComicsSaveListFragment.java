@@ -96,38 +96,21 @@ public class ComicsSaveListFragment extends Fragment {
             }
         });
 
-
-        PermissionListener permissionlistener = new PermissionListener() {
-            @Override
-            public void onPermissionGranted() {
-                folderList = getFolderList();
-                setComicsData(folderList);
-                adapter.setComicsData(setComicsThum(folderList));
-            }
-
-            @Override
-            public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-                Toast.makeText(getActivity(), "권한을 허용해주세요.\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
-            }
-
-        };
-
-        new TedPermission(getActivity())
-                .setPermissionListener(permissionlistener)
-                .setDeniedMessage("이 서비스를 이용할려면 권한이 필요합니다.\n\n권한을 허용해주세요. [설정] > [권한]")
-                .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .check();
-
+        folderList = getFolderList();
+        setComicsData(folderList);
+        adapter.setComicsData(setComicsThum(folderList));
     }
 
     private ArrayList<ComicsData> getFolderList() {
         try {
+            ArrayList<ComicsData> folderList = new ArrayList<>();
             String path = Environment.getExternalStorageDirectory().toString() + "/마루뷰어/";
             File file = new File(path);
-            File[] files = file.listFiles();
-            ArrayList<ComicsData> folderList = new ArrayList<>();
-            for(int i = 0;i < files.length;i++) {
-                folderList.add(0, new ComicsData(files[i].getName(), files[i].getAbsolutePath()));
+            if(file.exists()) {
+                File[] files = file.listFiles();
+                for (int i = 0; i < files.length; i++) {
+                    folderList.add(0, new ComicsData(files[i].getName(), files[i].getAbsolutePath()));
+                }
             }
             return folderList;
         } catch(Exception e) {

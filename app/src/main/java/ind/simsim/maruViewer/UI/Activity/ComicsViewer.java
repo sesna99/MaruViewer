@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebSettings;
@@ -17,9 +18,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
@@ -34,7 +32,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Service.ApplicationController;
 import ind.simsim.maruViewer.Service.ComicsData;
 import ind.simsim.maruViewer.Service.ComicsSave;
 import ind.simsim.maruViewer.Service.PreferencesManager;
@@ -165,11 +162,6 @@ public class ComicsViewer extends Activity {
             createHtml();
         else
             new Comics().execute();
-
-
-        Tracker t = ((ApplicationController)getApplication()).getTracker(ApplicationController.TrackerName.APP_TRACKER);
-        t.setScreenName("ComicsViewer");
-        t.send(new HitBuilders.AppViewBuilder().build());
     }
 
     class Comics extends AsyncTask<Void, Void, Void> {
@@ -196,6 +188,8 @@ public class ComicsViewer extends Activity {
                 Document document = Jsoup.connect(comicsUrl).timeout(0).post();
                 image = document.select("img");
                 title = document.select("title");
+                Log.i("title", title.get(0).text());
+                Log.i("html", document.html());
 
                 html = new StringBuilder();
                 html.append(getResources().getString(R.string.htmlStart));
@@ -345,13 +339,11 @@ public class ComicsViewer extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        GoogleAnalytics.getInstance(this).reportActivityStart(this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        GoogleAnalytics.getInstance(this).reportActivityStop(this);
         if(!comicsUrl.equals(""))
             pm.updateLately(pm.getLatelyPosition(comicsUrl), webView.getScrollY());
     }

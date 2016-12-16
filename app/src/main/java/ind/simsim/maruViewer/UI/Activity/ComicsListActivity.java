@@ -6,13 +6,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Service.ApplicationController;
 import ind.simsim.maruViewer.UI.Fragment.ComicsListFragment;
 import ind.simsim.maruViewer.UI.Fragment.SearchFragment;
 
@@ -38,21 +32,16 @@ public class ComicsListActivity extends Activity {
 
         initFragment();
 
-        Tracker t = ((ApplicationController)getApplication()).getTracker(ApplicationController.TrackerName.APP_TRACKER);
-        t.setScreenName("ComicsListActivity");
-        t.send(new HitBuilders.AppViewBuilder().build());
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        GoogleAnalytics.getInstance(this).reportActivityStart(this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        GoogleAnalytics.getInstance(this).reportActivityStop(this);
     }
 
     private void initFragment(){
