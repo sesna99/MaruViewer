@@ -45,7 +45,7 @@ import ind.simsim.maruViewer.Service.PreferencesManager;
 public class ComicsViewer extends Activity {
     private View mCustomView;
     private ActionBar actionBar;
-    private ImageButton save, favorite;
+    private ImageButton back, favorite, save;
     private String comicsUrl, episodeUrl;
     private TextView titleView;
     private Intent intent;
@@ -83,8 +83,8 @@ public class ComicsViewer extends Activity {
 
         pm = PreferencesManager.getInstance(getApplicationContext());
 
-        save = (ImageButton) mCustomView.findViewById(R.id.back);
-        save.setOnClickListener(new View.OnClickListener() {
+        back = (ImageButton) mCustomView.findViewById(R.id.back);
+        back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
@@ -137,11 +137,14 @@ public class ComicsViewer extends Activity {
         });
 
         final Activity activity = this;
-        ImageButton save = (ImageButton) mCustomView.findViewById(R.id.save);
+        save = (ImageButton) mCustomView.findViewById(R.id.save);
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new ComicsSave().save(activity, comicsUrl);
+                if(!comicsUrl.equals(""))
+                    new ComicsSave().save(activity, episodeUrl);
+                else
+                    Toast.makeText(activity, "저장된 만화는 저장이 불가능합니다.", Toast.LENGTH_SHORT).show();
             }
         });
 
