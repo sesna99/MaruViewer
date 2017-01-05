@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -37,7 +38,7 @@ public class ComicsListFragment extends Fragment {
     private int order = 1;
     private Bundle bundle;
     private SwipyRefreshLayout load;
-    private boolean isFirst = true;
+    private boolean isFirst;
     private float oldY = 0, curY = 0;
 
     public ComicsListFragment() {
@@ -48,19 +49,70 @@ public class ComicsListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         bundle = getArguments();
         url = bundle.getString("url");
+        Log.i("life", "create");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.list_fragment, container, false);
         initList(v);
+        Log.i("life", "createview");
         return v;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Log.i("life", "viewcreated");
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.i("life", "activitycreate");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.i("life", "start");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i("life", "resume");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.i("life", "detach");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.i("life", "destroy");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.i("life", "stop");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.i("life", "pause");
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         order = 1;
+        Log.i("life", "destroy");
     }
 
     private void initList(View v){
@@ -91,6 +143,8 @@ public class ComicsListFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        isFirst = true;
 
        /* mComicsList.setOnTouchListener(new View.OnTouchListener() {
             @Override

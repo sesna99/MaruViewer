@@ -127,7 +127,6 @@ public class PreferencesManager {
 
     public ArrayList<ComicsData> getLately(){
         int position = getPosition("lately");
-        Log.i("position", position+"");
         ArrayList<ComicsData> comicsDatas = new ArrayList<>();
         ComicsData data;
         for(int i = 0; i < position; i++){
