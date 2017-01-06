@@ -4,12 +4,14 @@ import android.Manifest;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -61,11 +63,6 @@ public class MainActivity extends Activity {
 
         initDrawer();
 
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
@@ -84,11 +81,6 @@ public class MainActivity extends Activity {
                 .setDeniedMessage("이 서비스를 이용할려면 권한이 필요합니다.\n\n권한을 허용해주세요. [설정] > [권한]")
                 .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .check();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
     }
 
     private void initDrawer(){
@@ -146,7 +138,6 @@ public class MainActivity extends Activity {
     }
 
     private void init(){
-        initDrawer();
         adapter = new PageAdapter(getApplicationContext(), getFragmentManager(), 5);
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(adapter);

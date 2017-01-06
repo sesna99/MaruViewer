@@ -1,7 +1,9 @@
 package ind.simsim.maruViewer.UI.Fragment;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -49,77 +51,25 @@ public class ComicsListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         bundle = getArguments();
         url = bundle.getString("url");
-        Log.i("life", "create");
+        initListData();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.list_fragment, container, false);
         initList(v);
-        Log.i("life", "createview");
         return v;
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        Log.i("life", "viewcreated");
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Log.i("life", "activitycreate");
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Log.i("life", "start");
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.i("life", "resume");
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.i("life", "detach");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.i("life", "destroy");
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        Log.i("life", "stop");
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.i("life", "pause");
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         order = 1;
-        Log.i("life", "destroy");
     }
 
     private void initList(View v){
-        comicsData = new ArrayList<>();
-
         mComicsList = (ListView)v.findViewById(R.id.listView);
-        adapter = new ComicsListAdapter(getActivity(), R.layout.list_item, comicsData);
+        adapter = new ComicsListAdapter(getActivity(), R.layout.list_item, new ArrayList<ComicsData>());
 
         load = (SwipyRefreshLayout)v.findViewById(R.id.loadlist);
         load.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
@@ -144,8 +94,6 @@ public class ComicsListFragment extends Fragment {
             }
         });
 
-        isFirst = true;
-
        /* mComicsList.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -169,6 +117,12 @@ public class ComicsListFragment extends Fragment {
             }
         });*/
 
+
+    }
+
+    public void initListData(){
+        comicsData = new ArrayList<>();
+        isFirst = true;
         new ComicsList().execute();
     }
 
