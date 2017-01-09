@@ -172,7 +172,7 @@ public class ComicsSave {
                         data = new ComicsData();
                         data.setTitle(saveData.get(i).getTitle());
                         data.setImageName(j + ".jpg");
-                        data.setImage(image.get(j).attr("data-src"));
+                        data.setImage("http://wasabisyrup.com" + image.get(j).attr("data-src"));
                         datas.add(data);
                     }
                     dataArray.add(datas);

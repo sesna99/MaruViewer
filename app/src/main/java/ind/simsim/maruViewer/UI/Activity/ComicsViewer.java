@@ -150,7 +150,7 @@ public class ComicsViewer extends Activity {
 
         DisplayMetrics dm = getApplicationContext().getResources().getDisplayMetrics();
         dWidth = dm.widthPixels;
-        dHeight = dm.heightPixels - 100;
+        dHeight = dm.heightPixels - 200;
 
         webView = (WebView) findViewById(R.id.webView);
         webView.setWebViewClient(new WebViewClient());
@@ -243,7 +243,7 @@ public class ComicsViewer extends Activity {
             }
 
             String temp = title.get(0).text();
-            titleView.setText(temp.substring(0, temp.length() - 13));
+            titleView.setText(temp.substring(0, temp.length() - 14));
             loadComics();
         }
     }
@@ -291,7 +291,7 @@ public class ComicsViewer extends Activity {
         ArrayList<String> image = intent.getStringArrayListExtra("image");
         int size = image.size();
         for (int i = 0; i < size; i++)
-            html.append("<img src=").append("\"file://" + image.get(i)).append("\" width=").append(dWidth).append(" height=").append(dHeight * 2).append("/> ");
+            html.append("<img src=").append("\"file://" + image.get(i)).append("\" width=").append(dWidth).append(" height=").append(dHeight).append("/> ");
         html.append(getResources().getString(R.string.htmlEnd));
 
         path = getCacheDir() + "/maru.html";
@@ -322,6 +322,8 @@ public class ComicsViewer extends Activity {
 
     public void loadNextComics() {
         for (int i = 0; i < comicsDatas.size(); i++) {
+            Log.i("title", titleView.getText().toString());
+            Log.i("data", comicsDatas.get(i).getTitle());
             if (titleView.getText().toString().equals(comicsDatas.get(i).getTitle())) {
                 if (i + 1 < comicsDatas.size()) {
                     if (!comicsDatas.get(i + 1).getTitle().contains("전편")) {
