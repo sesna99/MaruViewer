@@ -228,7 +228,7 @@ public class ComicsViewer extends BaseActivity {
             try {
                 Log.i("url", comicsUrl);
                 String url = Jsoup.connect(comicsUrl).timeout(0).followRedirects(true).execute().url().toExternalForm();
-                Connection conn = Jsoup.connect(url).cookie("wp-postpass_e1ac6d6cb3b647764881f16d009c885c", "%24P%24B7TTtyw0aLlsT1XDbHUOnmABsLoItB0").timeout(0).userAgent("Firefox/2.0.0.6").referrer("http://marumaru.in").method(Connection.Method.POST);
+                Connection conn = Jsoup.connect(url).data("pass", "qndxkr").timeout(0).userAgent("Firefox/2.0.0.6").referrer("http://marumaru.in").method(Connection.Method.POST);
                 Connection.Response res = conn.execute();
                 Document document = res.parse();
 
@@ -276,7 +276,7 @@ public class ComicsViewer extends BaseActivity {
                 bw = new BufferedWriter(fw);
                 bw.write(html.toString());
                 bw.flush();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
