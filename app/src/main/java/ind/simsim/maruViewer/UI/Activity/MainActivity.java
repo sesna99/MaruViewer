@@ -1,24 +1,19 @@
 package ind.simsim.maruViewer.UI.Activity;
 
 import android.Manifest;
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.support.design.widget.NavigationView;
+import android.view.Gravity;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.SearchView;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.flyco.tablayout.CommonTabLayout;
@@ -26,26 +21,39 @@ import com.flyco.tablayout.listener.CustomTabEntity;
 import com.flyco.tablayout.listener.OnTabSelectListener;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
-import com.ikimuhendis.ldrawer.ActionBarDrawerToggle;
-import com.ikimuhendis.ldrawer.DrawerArrowDrawable;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import ind.simsim.maruViewer.Event.UpdateEvent;
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Service.TabEntity;
-import ind.simsim.maruViewer.UI.Adapter.DrawerListAdapter;
+import ind.simsim.maruViewer.Model.TabEntity;
+import ind.simsim.maruViewer.Service.UpdateCheck;
 import ind.simsim.maruViewer.UI.Adapter.PageAdapter;
 
 
-public class MainActivity extends Activity {
-    private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
-    private ActionBarDrawerToggle mDrawerToggle;
-    private DrawerArrowDrawable drawerArrow;
-    private MenuItem searchMenu;
+public class MainActivity extends BaseActivity {
+    @BindView(R.id.navigation_menu)
+    ImageView navigation_menu;
+
+    @BindView(R.id.title_view)
+    TextView title_view;
+
+    @BindView(R.id.search_view)
+    ImageView search_view;
+
+    @BindView(R.id.drawer_layout)
+    DrawerLayout drawer_layout;
+
+    @BindView(R.id.navigation_view)
+    NavigationView navigation_view;
+
     private ViewPager mViewPager;
     private PageAdapter adapter;
-    private ActionBar actionBar;
     private CommonTabLayout tabLayout;
     private ArrayList<CustomTabEntity> tabEntities;
     private String[] title = {"업데이트", "다운로드", "즐겨찾기", "최근본만화", "설정"};
@@ -56,94 +64,54 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        actionBar = getActionBar();
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
 
-        initDrawer();
+        ButterKnife.bind(this);
 
-        PermissionListener permissionlistener = new PermissionListener() {
-            @Override
-            public void onPermissionGranted() {
-                init();
-            }
+        EventBus.getDefault().register(this);
 
-            @Override
-            public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-                Toast.makeText(getApplicationContext(), "권한을 허용해주세요.\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
-            }
-
-        };
-
-        new TedPermission(getApplicationContext())
-                .setPermissionListener(permissionlistener)
-                .setDeniedMessage("이 서비스를 이용할려면 권한이 필요합니다.\n\n권한을 허용해주세요. [설정] > [권한]")
-                .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .check();
+        new UpdateCheck(this).check();
     }
 
-    private void initDrawer(){
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.navdrawer);
+    private void init() {
+        setNavigation();
 
-        drawerArrow = new DrawerArrowDrawable(this) {
+        title_view.setText(title[0]);
+
+        search_view.setVisibility(View.VISIBLE);
+        search_view.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean isLayoutRtl() {
-                return false;
-            }
-        };
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                drawerArrow, R.string.drawer_open,
-                R.string.drawer_close) {
+            public void onClick(View view) {
+                final View v = getLayoutInflater().inflate(R.layout.search_dialog, null);
+                AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
+                        .setView(v)
+                        .setTitle("검색")
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Intent intent = new Intent(MainActivity.this, ComicsListActivity.class);
+                                intent.putExtra("position", -1);
+                                intent.putExtra("url", getString(R.string.search, ((EditText)v.findViewById(R.id.search_text)).getText().toString()));
+                                intent.putExtra("category", "검색");
+                                startActivity(intent);
+                            }
+                        })
+                        .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
 
-            public void onDrawerClosed(View view) {
-                super.onDrawerClosed(view);
-                invalidateOptionsMenu();
-            }
-
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                invalidateOptionsMenu();
-            }
-        };
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-        mDrawerToggle.syncState();
-
-        // create our list and custom adapter
-        DrawerListAdapter adapter = new DrawerListAdapter(this);
-        adapter.addSection("만화", new ArrayAdapter<String>(this,
-                R.layout.drawer_list_item, R.id.text1,
-                new String[]{"전체보기", "업데이트 알림", "주간", "격주", "월간", "격월/비정기", "단행본", "완결", "단편", "붕탁", "와이!", "오토코노코 엔솔로지", "여장소년 엔솔로지", "오토코노코타임", "붕탁 완결"}));
-        adapter.addSection("장르", new ArrayAdapter<String>(this,
-                R.layout.drawer_list_item, R.id.text1,
-                new String[]{"17", "SF", "TS", "개그", "드라마", "러브코미디", "먹방", "백합", "붕탁", "순정", "스릴러", "스포츠", "시대", "액션", "일상 치유", "추리", "판타지", "학원", "호러"}));
-
-        mDrawerList.setAdapter(adapter);
-        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                switch (position) {
-                    case 0:
-                        mDrawerToggle.setAnimateEnabled(false);
-                        drawerArrow.setProgress(1f);
-                        break;
-                    default:
-                        selectItem(position);
-                }
-
+                            }
+                        })
+                        .create();
+                dialog.show();
             }
         });
-    }
 
-    private void init(){
         adapter = new PageAdapter(getApplicationContext(), getFragmentManager(), 5);
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(adapter);
 
         tabEntities = new ArrayList<>();
-        for(int i = 0; i < selectImg.length; i++)
+        for (int i = 0; i < selectImg.length; i++)
             tabEntities.add(new TabEntity(title[i], selectImg[i], unselectImg[i]));
 
         tabLayout = (CommonTabLayout) findViewById(R.id.tabs);
@@ -158,6 +126,7 @@ public class MainActivity extends Activity {
             @Override
             public void onPageSelected(int position) {
                 tabLayout.setCurrentTab(position);
+                title_view.setText(title[position]);
             }
 
             @Override
@@ -179,105 +148,110 @@ public class MainActivity extends Activity {
         });
     }
 
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
-                mDrawerLayout.closeDrawer(mDrawerList);
-            } else {
-                mDrawerLayout.openDrawer(mDrawerList);
+    private void checkPermission(){
+        PermissionListener permissionlistener = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+                init();
             }
-        }
-        return super.onOptionsItemSelected(item);
+
+            @Override
+            public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+                Toast.makeText(getApplicationContext(), "권한을 허용해주세요.\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+            }
+
+        };
+
+        new TedPermission(getApplicationContext())
+                .setPermissionListener(permissionlistener)
+                .setDeniedMessage("이 서비스를 이용할려면 권한이 필요합니다.\n\n권한을 허용해주세요. [설정] > [권한]")
+                .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .check();
     }
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        mDrawerToggle.syncState();
+    private void setNavigation(){
+        navigation_menu.setVisibility(View.VISIBLE);
+        navigation_menu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                drawer_layout.openDrawer(Gravity.LEFT);
+            }
+        });
+
+        View headerView = navigation_view.getHeaderView(0);
+        View headerItem = getLayoutInflater().inflate(R.layout.drawer_list_item, null);
+        TextView list_text = (TextView) headerItem.findViewById(R.id.list_text);
+        LinearLayout category_comics = (LinearLayout)headerView.findViewById(R.id.category_comics);
+        LinearLayout category_genre = (LinearLayout)headerView.findViewById(R.id.category_genre);
+        final String[] comics = getResources().getStringArray(R.array.category_comics);
+        final String[] genre = getResources().getStringArray(R.array.category_genre);
+
+        for(int i = 0; i < comics.length; i++){
+            final int position = i;
+            headerItem = getLayoutInflater().inflate(R.layout.drawer_list_item, null);
+            list_text = (TextView) headerItem.findViewById(R.id.list_text);
+            list_text.setText(comics[position]);
+            list_text.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    selectItem(position, comics[position], true);
+                }
+            });
+            category_comics.addView(headerItem);
+        }
+
+        for(int i = 0; i < genre.length; i++){
+            final int position = i;
+            headerItem = getLayoutInflater().inflate(R.layout.drawer_list_item, null);
+            list_text = (TextView) headerItem.findViewById(R.id.list_text);
+            list_text.setText(genre[position]);
+            list_text.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    selectItem(position, genre[position], false);
+                }
+            });
+            category_genre.addView(headerItem);
+        }
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        mDrawerToggle.onConfigurationChanged(newConfig);
-    }
+    private void selectItem(int position, String category, boolean isComics) {
+        drawer_layout.closeDrawers();
 
-    private void selectItem(int position) {
-        if (mDrawerList != null) {
-            mDrawerList.setItemChecked(position, true);
-        }
-        if (mDrawerLayout != null) {
-            mDrawerLayout.closeDrawer(mDrawerList);
-        }
-        //FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if(position > 15) {
+        if (!isComics) {
             Intent intent = new Intent(this, ComicsListActivity.class);
-            intent.putExtra("position", position - 2);
+            intent.putExtra("category", category);
+            intent.putExtra("position", position + 15);
             startActivity(intent);
-            //transaction.replace(R.id.fragment, fragmentArray.get(position - 1));
-        }
-        else {
-            if(position != 2) {
+        } else {
+            if (position != 1) {
                 Intent intent = new Intent(this, ComicsListActivity.class);
-                intent.putExtra("position", position - 1);
+                intent.putExtra("category", category);
+                intent.putExtra("position", position);
                 startActivity(intent);
-            }
-            else{
+            } else {
                 mViewPager.setCurrentItem(0);
                 tabLayout.setCurrentTab(0);
             }
-            //transaction.replace(R.id.fragment, fragmentArray.get(position - 2));
         }
-
-        //transaction.commit();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+    @Subscribe
+    public void onUpdateEvent(final UpdateEvent event){
+        if(!event.isUpdate()){
+            Toast.makeText(this, "최신 버전입니다.", Toast.LENGTH_SHORT).show();
+            checkPermission();
+        }
 
-        searchMenu = menu.findItem(R.id.search);
-        SearchView searchView = (SearchView) searchMenu.getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                /*bundle = new Bundle();
-                bundle.putString("url", getString(R.string.search, s));
-                fragment = new SearchFragment();
-                fragment.setArguments(bundle);*/
-                Intent intent = new Intent(MainActivity.this, ComicsListActivity.class);
-                intent.putExtra("position", -1);
-                intent.putExtra("url", getString(R.string.search, s));
-                startActivity(intent);
-                /*
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment, fragment);
-                transaction.commit();
-                */
-                searchMenu.collapseActionView();
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                return false;
-            }
-        });
-        return true;
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
     public void onBackPressed() {
-        if(searchMenu.isActionViewExpanded()){
-            searchMenu.collapseActionView();
+        if (drawer_layout.isDrawerOpen(Gravity.LEFT)) {
+            drawer_layout.closeDrawers();
         }
-        else if(mDrawerLayout.isDrawerOpen(mDrawerList)){
-            mDrawerLayout.closeDrawer(mDrawerList);
-        }
-        else{
+        else {
             new AlertDialog.Builder(this).setTitle("종료").setMessage("종료하시겠습니까?").setPositiveButton("예", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {

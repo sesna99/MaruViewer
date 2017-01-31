@@ -1,27 +1,26 @@
 package ind.simsim.maruViewer.UI.Fragment;
 
-import android.Manifest;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.gun0912.tedpermission.PermissionListener;
-import com.gun0912.tedpermission.TedPermission;
-import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
-import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
 import java.util.ArrayList;
 
+import ind.simsim.maruViewer.Event.DownLoadEvent;
+import ind.simsim.maruViewer.Event.DownLoadRemoveEvent;
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Service.ComicsData;
+import ind.simsim.maruViewer.Model.ComicsData;
+import ind.simsim.maruViewer.Service.PreferencesManager;
 import ind.simsim.maruViewer.UI.Activity.ComicsViewer;
 import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
 
@@ -34,7 +33,6 @@ public class ComicsSaveListFragment extends Fragment {
     private ComicsListAdapter adapter;
     private ArrayList<ArrayList<String>> comicsData;
     private ArrayList<ComicsData> folderList;
-    private SwipyRefreshLayout refreshLayout;
     private boolean isFirst = true;
 
     public ComicsSaveListFragment() {
@@ -47,40 +45,25 @@ public class ComicsSaveListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.list_fragment, container, false);
+        View v = inflater.inflate(R.layout.fragment_list, container, false);
         initList(v);
 
-        refreshLayout = (SwipyRefreshLayout) v.findViewById(R.id.loadlist);
-        refreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh(SwipyRefreshLayoutDirection direction) {
-                folderList = getFolderList();
-                setComicsData(folderList);
-                adapter.setComicsData(setComicsThum(folderList));
-                refreshLayout.setRefreshing(false);
-            }
-        });
-
         isFirst = false;
-        return v;
-    }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        refresh();
+        EventBus.getDefault().register(this);
+
+        return v;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        EventBus.getDefault().unregister(this);
     }
 
     private void initList(View v){
-        comicsData = new ArrayList<>();
-
         mComicsList = (ListView)v.findViewById(R.id.listView);
-        adapter = new ComicsListAdapter(getActivity(), R.layout.list_item, new ArrayList<ComicsData>());
+        adapter = new ComicsListAdapter(getActivity(), R.layout.fragment_list_item, new ArrayList<ComicsData>());
 
 
         mComicsList.setAdapter(adapter);
@@ -93,6 +76,7 @@ public class ComicsSaveListFragment extends Fragment {
                 intent.putExtra("comicsUrl", "");
                 intent.putExtra("episodeUrl", "");
                 startActivity(intent);
+                Log.i("path", comicsData.get(position).get(0));
             }
         });
 
@@ -104,7 +88,7 @@ public class ComicsSaveListFragment extends Fragment {
     private ArrayList<ComicsData> getFolderList() {
         try {
             ArrayList<ComicsData> folderList = new ArrayList<>();
-            String path = Environment.getExternalStorageDirectory().toString() + "/마루뷰어/";
+            String path = PreferencesManager.getInstance(getActivity()).getDownLoadDirectory();
             File file = new File(path);
             if(file.exists()) {
                 File[] files = file.listFiles();
@@ -137,6 +121,7 @@ public class ComicsSaveListFragment extends Fragment {
     }
 
     private void setComicsData(ArrayList<ComicsData> folderList){
+        comicsData = new ArrayList<>();
         try {
             String path;
             File file;
@@ -159,7 +144,21 @@ public class ComicsSaveListFragment extends Fragment {
         if(!isFirst) {
             folderList = getFolderList();
             setComicsData(folderList);
-            adapter.setComicsData(setComicsThum(folderList));
+            setComicsThum(folderList);
+            adapter.setComicsData(folderList);
+            adapter.notifyDataSetChanged();
         }
+    }
+
+    @Subscribe
+    public void onDownLoadEvent(DownLoadEvent event){
+        if(event.isSucceed())
+            refresh();
+    }
+
+    @Subscribe
+    public void onDownLoadRemoveEvent(DownLoadRemoveEvent event){
+        if(event.isSucceed())
+            refresh();
     }
 }

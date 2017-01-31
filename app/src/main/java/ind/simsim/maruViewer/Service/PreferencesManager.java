@@ -2,10 +2,17 @@ package ind.simsim.maruViewer.Service;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.util.Log;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.Collections;
+
+import ind.simsim.maruViewer.Event.FavoriteEvent;
+import ind.simsim.maruViewer.Event.LatelyEvent;
+import ind.simsim.maruViewer.Model.ComicsData;
 
 /**
  * Created by jack on 2016. 12. 15..
@@ -30,6 +37,7 @@ public class PreferencesManager {
         editor.putString("favoritesImage" + position, data.getImage());
         editor.commit();
         setPosition("favorites");
+        EventBus.getDefault().post(new FavoriteEvent(true));
     }
 
     public void deleteFavorites(int position){
@@ -50,6 +58,8 @@ public class PreferencesManager {
         editor.remove("favoritesImage" + (size - 1));
 
         setPosition("favorites", size - 1);
+
+        EventBus.getDefault().post(new FavoriteEvent(true));
     }
 
     public ArrayList<ComicsData> getFavorites(){
@@ -98,6 +108,8 @@ public class PreferencesManager {
         editor.putInt("scroll" + position, scroll);
         editor.commit();
         setPosition("lately");
+
+        EventBus.getDefault().post(new LatelyEvent(true));
     }
 
     public void updateLately(int position, int scroll){
@@ -123,6 +135,8 @@ public class PreferencesManager {
         editor.remove("scroll" + (size - 1));
 
         setPosition("lately", size - 1);
+
+        EventBus.getDefault().post(new LatelyEvent(true));
     }
 
     public ArrayList<ComicsData> getLately(){
@@ -136,6 +150,9 @@ public class PreferencesManager {
             data.setEpisodeUrl(sharedPreferences.getString("latelyEpisodeUrl" + i, ""));
             data.setImage(sharedPreferences.getString("latelyImage" + i, ""));
             comicsDatas.add(data);
+        }
+        for(int i = 0; i < comicsDatas.size() / 2; i++){
+            Collections.swap(comicsDatas, i, comicsDatas.size() - i - 1);
         }
         return comicsDatas;
     }
@@ -181,6 +198,15 @@ public class PreferencesManager {
 
     public String getCode(int position){
         return sharedPreferences.getString("code" + position, "");
+    }
+
+    public void setDownLoadDirectory(String directory){
+        editor.putString("directory", directory);
+        editor.commit();
+    }
+
+    public String getDownLoadDirectory(){
+        return sharedPreferences.getString("directory", Environment.getExternalStorageDirectory().toString() + "/마루뷰어/");
     }
 
     public static PreferencesManager getInstance(Context context){

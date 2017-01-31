@@ -1,51 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:layout_height="55dp"
+    android:background="@drawable/thick_bottom_border"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingPrefix">
 
     <ImageButton
+        android:id="@+id/back_button"
+        android:layout_width="20dp"
+        android:layout_height="25dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="20dp"
+        android:background="@drawable/back_button"
+        android:visibility="invisible"/>
+
+    <ImageButton
+        android:id="@+id/navigation_menu"
         android:layout_width="25dp"
         android:layout_height="25dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="20dp"
+        android:background="@drawable/navigation_icon"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/title_view"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="#000000"
+        android:textSize="17dp"
         android:layout_gravity="center"
-        android:background="@drawable/abc_ic_ab_back_mtrl_am_alpha"
-        android:id="@+id/back" />
+        android:gravity="center"
+        android:ellipsize="marquee"
+        android:focusable="true"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
+        app:font="custom3"/>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="right|center_vertical"
+        android:layout_marginRight="20dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="25dp"
-            android:textColor="#ffffff"
-            android:textSize="17dp"
-            android:id="@+id/title"
-            android:layout_centerInParent="true"
-            android:layout_marginLeft="20dp"
-            android:gravity="center_vertical"
-            android:ellipsize="marquee"
-            android:focusable="true"
-            android:marqueeRepeatLimit="marquee_forever"
-            android:singleLine="true"/>
+        <ImageButton
+            android:layout_width="22dp"
+            android:layout_height="20dp"
+            android:id="@+id/favorite_button"
+            android:layout_marginRight="15dp"
+            android:background="@drawable/star3"
+            android:visibility="invisible"/>
 
-    </RelativeLayout>
+        <ImageButton
+            android:layout_width="22dp"
+            android:layout_height="20dp"
+            android:id="@+id/save_button"
+            android:background="@drawable/save1"
+            android:visibility="invisible"/>
 
-    <ImageButton
-        android:layout_width="22dp"
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/search_view"
+        android:layout_width="20dp"
         android:layout_height="20dp"
-        android:layout_gravity="center"
-        android:id="@+id/favorite"
-        android:layout_marginRight="15dp"
-        android:background="@drawable/star3"/>
+        android:src="@drawable/search"
+        android:layout_marginRight="20dp"
+        android:layout_gravity="right|center_vertical"
+        android:visibility="invisible"/>
 
-    <ImageButton
-        android:layout_width="22dp"
+
+    <ImageView
+        android:id="@+id/remove_view"
+        android:layout_width="20dp"
         android:layout_height="20dp"
-        android:layout_gravity="center"
-        android:id="@+id/save"
-        android:layout_marginRight="15dp"
-        android:background="@drawable/save3"/>
+        android:src="@drawable/remove"
+        android:layout_marginRight="20dp"
+        android:layout_gravity="right|center_vertical"
+        android:visibility="invisible"/>
 
-</LinearLayout>
+</FrameLayout>

@@ -4,6 +4,47 @@
     <string name="app_name">마루뷰어</string>
     <string name="drawer_open">drawer_open</string>
     <string name="drawer_close">drawer_close</string>
+
+    <string-array name="category_comics">
+        <item>전체보기</item>
+        <item>업데이트 알림</item>
+        <item>주간</item>
+        <item>격주</item>
+        <item>월간</item>
+        <item>격월/비정기</item>
+        <item>단행본</item>
+        <item>완결</item>
+        <item>단편</item>
+        <item>붕탁</item>
+        <item>와이!</item>
+        <item>오토코노코 엔솔로지</item>
+        <item>여장소년 엔솔로지</item>
+        <item>오토코노코타임</item>
+        <item>붕탁 완결</item>
+    </string-array>
+
+    <string-array name="category_genre">
+        <item>17</item>
+        <item>SF</item>
+        <item>TS</item>
+        <item>개그</item>
+        <item>드라마</item>
+        <item>러브코미디</item>
+        <item>먹방</item>
+        <item>백합</item>
+        <item>붕탁</item>
+        <item>순정</item>
+        <item>스릴러</item>
+        <item>스포츠</item>
+        <item>시대</item>
+        <item>액션</item>
+        <item>일상 치유</item>
+        <item>추리</item>
+        <item>판타지</item>
+        <item>학원</item>
+        <item>호러</item>
+    </string-array>
+
     <string-array name = "url">
         <item>http://marumaru.in/?c=1/40<![CDATA[&]]>p=</item>
         <item>http://marumaru.in/?c=1/44<![CDATA[&]]>p=</item>
@@ -41,7 +82,7 @@
         <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A호러<![CDATA[&]]>p=</item>
     </string-array>
     <string name="search">http://marumaru.in/?r=home<![CDATA[&]]>mod=search<![CDATA[&]]>keyword=%1$s</string>
-    <string name="htmlStart" formatted="false"><![CDATA[<html><head><style>img{margin-left:20px; margin-right:20px; margin-bottom:25px;}</style></head><body><center><p>]]></string>
+    <string name="htmlStart" formatted="false">"<![CDATA[<html><head><style>img{margin-left:20px; margin-right:20px; margin-bottom:25px;}</style></head><body><center><p>]]>"</string>
     <string name="htmlEnd"><![CDATA[</p></center></body></html>]]></string>
     <string name="banner_ad_unit_id">ca-app-pub-3970497590731166/4514197737</string>
 </resources>

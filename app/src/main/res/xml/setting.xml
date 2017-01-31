@@ -14,8 +14,13 @@
         android:title="최근본만화 초기화"/>
 
     <Preference
+        android:key="kakao"
+        android:title="카카오톡"
+        android:summary="trycatch98"/>
+
+    <Preference
         android:key="update"
         android:title="업데이트 확인"
-        android:summary="현재 버전 : 3.0"/>
+        android:summary="현재 버전 : 3.3"/>
 
 </PreferenceScreen>

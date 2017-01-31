@@ -1,9 +1,22 @@
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/text1"
-    android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceListItemSmall"
-    android:gravity="center_vertical"
-    android:textSize="15dp"
-    android:paddingLeft="20dp"
-    android:minHeight="?android:attr/listPreferredItemHeightSmall" />
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingPrefix">
+
+    <TextView
+        android:id="@+id/list_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:textSize="15dp"
+        android:textColor="#252525"
+        android:background="?android:attr/selectableItemBackground"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:paddingLeft="20dp"
+        app:font="custom5"/>
+
+</LinearLayout>

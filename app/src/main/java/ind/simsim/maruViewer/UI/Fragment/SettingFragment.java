@@ -1,64 +1,95 @@
 package ind.simsim.maruViewer.UI.Fragment;
 
+import android.app.Fragment;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.Preference;
-import android.preference.PreferenceFragment;
+import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ind.simsim.maruViewer.R;
 import ind.simsim.maruViewer.Service.PreferencesManager;
 
 /**
- * Created by jack on 2016. 12. 16..
+ * Created by jack on 2017. 1. 24..
  */
 
-public class SettingFragment extends PreferenceFragment {
-    private Preference path, cache, lately, update;
-    private PreferencesManager pm;
+public class SettingFragment extends Fragment {
+    @BindView(R.id.download_directory)
+    LinearLayout download_directory;
 
+    @BindView(R.id.download_directory_text)
+    TextView download_directory_text;
+
+    @BindView(R.id.clear_cache)
+    TextView clear_cache;
+
+    @BindView(R.id.clear_lately)
+    TextView clear_lately;
+
+    @BindView(R.id.update)
+    LinearLayout update;
+
+    @BindView(R.id.update_text)
+    TextView update_text;
+
+
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.setting);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_setting, null);
 
-        path = findPreference("path");
-        cache = findPreference("cache");
-        lately = findPreference("lately");
-        update = findPreference("update");
+        ButterKnife.bind(this, v);
 
-        pm = PreferencesManager.getInstance(getActivity());
+        init();
 
-        path.setSummary(Environment.getExternalStorageDirectory().toString() + "/마루뷰어");
-        cache.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        return v;
+    }
+
+    public void init(){
+        download_directory_text.setText(PreferencesManager.getInstance(getActivity()).getDownLoadDirectory());
+        PackageInfo pInfo = null;
+        try {
+            pInfo = getActivity().getPackageManager().getPackageInfo(
+                    getActivity().getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+        }
+        String versionName = pInfo.versionName;
+        update_text.setText("현재 버전 : " + versionName);
+
+        clear_cache.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onPreferenceClick(Preference preference) {
+            public void onClick(View view) {
                 clearApplicationCache(null);
-                return false;
             }
         });
 
-        lately.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        clear_lately.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onPreferenceClick(Preference preference) {
-                int size = pm.getPosition("lately") - 1;
+            public void onClick(View view) {
+                int size = PreferencesManager.getInstance(getActivity()).getPosition("lately") - 1;
                 for(int i = 0; i <= size;){
-                    pm.deleteLately(i);
-                    size = pm.getPosition("lately") - 1;
+                    PreferencesManager.getInstance(getActivity()).deleteLately(i);
+                    size = PreferencesManager.getInstance(getActivity()).getPosition("lately") - 1;
                 }
-                return false;
             }
         });
 
-        update.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        update.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onPreferenceClick(Preference preference) {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                Uri uri = Uri.parse("http://trycatch98.tistory.com/category/Project/MaruViewer");
-                intent.setData(uri);
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://trycatch98.tistory.com/category/Project/MaruViewer"));
                 startActivity(intent);
-                return false;
             }
         });
     }

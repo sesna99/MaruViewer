@@ -2,48 +2,46 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tl="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingPrefix">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <include layout="@layout/custom_actionbar"/>
+
         <android.support.v4.view.ViewPager
             android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="10"/>
+            android:layout_weight="1"/>
 
         <com.flyco.tablayout.CommonTabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.3"
-            android:background="#EEEEEE"
+            android:layout_height="55dp"
+            android:background="@drawable/thick_top_border"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
             app:tl_iconWidth="25dp"
             app:tl_iconHeight="25dp"
             app:tl_textsize="10sp"
-            app:tl_textSelectColor="#90caf9"
-            app:tl_textUnselectColor="#bdbdbd"/>
+            app:tl_textSelectColor="#000000"
+            app:tl_textUnselectColor="#bdbdbd"
+            app:font="custom4"/>
 
     </LinearLayout>
 
-    <!-- The navigation drawer -->
-    <ListView
-        android:id="@+id/navdrawer"
-        android:layout_width="@dimen/navdrawer_width"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:background="@android:color/white"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
-        android:drawSelectorOnTop="true">
-    </ListView>
+    <android.support.design.widget.NavigationView
+        android:id="@+id/navigation_view"
+        android:layout_width="220dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="left"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/navigation_header"/>
 
 </android.support.v4.widget.DrawerLayout>
 

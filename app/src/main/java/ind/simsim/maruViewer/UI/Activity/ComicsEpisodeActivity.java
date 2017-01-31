@@ -1,7 +1,5 @@
 package ind.simsim.maruViewer.UI.Activity;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -10,15 +8,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -29,16 +24,32 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Service.ComicsData;
+import ind.simsim.maruViewer.Model.ComicsData;
 import ind.simsim.maruViewer.Service.ComicsSave;
 import ind.simsim.maruViewer.Service.PreferencesManager;
 
 /**
  * Created by admin on 2016-02-19.
  */
-public class ComicsEpisodeActivity extends Activity {
+public class ComicsEpisodeActivity extends BaseActivity {
+    @BindView(R.id.back_button)
+    ImageView back_button;
+
+    @BindView(R.id.title_view)
+    TextView title_view;
+
+    @BindView(R.id.save_button)
+    ImageView save_button;
+
+    @BindView(R.id.favorite_button)
+    ImageView favorite_button;
+
     private Episode task;
     private String episodeUrl;
     private int dWidth, dHeight;
@@ -53,70 +64,59 @@ public class ComicsEpisodeActivity extends Activity {
     private StringBuilder html;
     private String title;
     private PreferencesManager pm;
-    private ImageButton save, favorite;
-    private TextView titleView;
     private String imageUrl;
     private ArrayList<String> episode;
+    private Map<String, String> comicsInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comics_episode);
 
+        ButterKnife.bind(this);
+
         episodeUrl = getIntent().getStringExtra("url");
         episodeUrl = episodeUrl.contains("marumaru") ? episodeUrl : "http://marumaru.in" + episodeUrl;
 
         title = getIntent().getStringExtra("title");
+        title_view.setSelected(true);
 
-        ActionBar actionBar = getActionBar();
-        actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(false);
+        pm = PreferencesManager.getInstance(getApplicationContext());
 
+        back_button.setVisibility(View.VISIBLE);
+        save_button.setVisibility(View.VISIBLE);
+        favorite_button.setVisibility(View.VISIBLE);
 
-        View mCustomView = LayoutInflater.from(this).inflate(R.layout.custom_actionbar, null);
-        actionBar.setCustomView(mCustomView);
-
-        ImageButton back = (ImageButton) mCustomView.findViewById(R.id.back);
-        back.setOnClickListener(new View.OnClickListener() {
+        back_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
 
-        titleView = (TextView) mCustomView.findViewById(R.id.title);
-        titleView.setText(title);
-        titleView.setSelected(true);
-
-        pm = PreferencesManager.getInstance(getApplicationContext());
-
-        final Activity activity = this;
-
-        save = (ImageButton) mCustomView.findViewById(R.id.save);
-        save.setOnClickListener(new View.OnClickListener() {
+        save_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new ComicsSave().save(activity, episodeUrl);
+                new ComicsSave().save(ComicsEpisodeActivity.this, episodeUrl);
             }
         });
 
-        favorite = (ImageButton) mCustomView.findViewById(R.id.favorite);
-        favorite.setOnClickListener(new View.OnClickListener() {
+        favorite_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(pm.searchFavorites("e", episodeUrl)){
                     pm.deleteFavorites(pm.getFavoritesPosition("e", episodeUrl));
-                    favorite.setBackgroundResource(R.drawable.star3);
+                    favorite_button.setBackgroundResource(R.drawable.star3);
                 }
                 else {
-                    pm.setFavorites(new ComicsData(title, imageUrl, "", episodeUrl), "e");
-                    favorite.setBackgroundResource(R.drawable.star4);
+                    pm.setFavorites(new ComicsData(title_view.getText().toString(), imageUrl, "", episodeUrl), "e");
+                    favorite_button.setBackgroundResource(R.drawable.star1);
                 }
             }
         });
 
         if(pm.searchFavorites("e", episodeUrl)){
-            favorite.setBackgroundResource(R.drawable.star4);
+            favorite_button.setBackgroundResource(R.drawable.star1);
         }
 
         path = getCacheDir() + "/episode.html";
@@ -173,11 +173,13 @@ public class ComicsEpisodeActivity extends Activity {
                 Document document = Jsoup.connect(episodeUrl).timeout(0).get();
                 Elements image = document.select("div img[src*=quickimage]");
                 Elements content = document.select("div[class=content] a");
+                Elements episodeTitle = document.select("div[class=subject] h1");
                 html = new StringBuilder();
                 html.append("<html><body><div style=\"text-align: center\"><img src=\"").append(image.attr("src")).append("\" width=").append(dWidth / 3.5).append(" height=").append(dHeight / 2.5).append("></div><br>");
                 html.append("<div align=\"center\" style=\"color: rgb(0, 0, 0); font-family: dotum; font-size: 12px; line-height: 19.2px; text-align: center;\"><br>");
                 imageUrl = image.attr("src");
                 episode = new ArrayList<>();
+                comicsInfo = new HashMap<>();
 
                 int size = content.size();
                 for (int i = 0; i < size; i++) {
@@ -186,12 +188,14 @@ public class ComicsEpisodeActivity extends Activity {
                             break;
                         html.append("<div align=\"center\" style=\"line-height: 19.2px;\"><a target=\"_blank\" href=\"").append(content.get(i).attr("href")).append("\" target=\"_self\"><font color=\"#717171\" style=\"color: rgb(113, 113, 113); text-decoration: none;\"><span style=\"font-size: 18.6667px; line-height: 19.2px;\">").append(content.get(i).text()).append("</span></font></a></div><br>");
                         episode.add(content.get(i).text());
+                        comicsInfo.put(content.get(i).attr("href"), content.get(i).text());
                     }
                 }
 
-
                 html.append("</div></body></html>");
 
+                if(title.equals(""))
+                    title = episodeTitle.text();
                 document = null;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -210,6 +214,7 @@ public class ComicsEpisodeActivity extends Activity {
                 e.printStackTrace();
             }
             webView.loadUrl("file://" + path);
+            title_view.setText(title);
         }
     }
 
@@ -219,17 +224,19 @@ public class ComicsEpisodeActivity extends Activity {
             super.onPageStarted(view, url, favicon);
             try {
                 if(!view.getOriginalUrl().equals(url)){
+                    Log.i("url", url);
                     if (!url.contains("maru")) {
-                        view.stopLoading();
-                        view.goBack();
+                        view.loadUrl(view.getOriginalUrl());
                         intent  = new Intent(getApplicationContext(), ComicsViewer.class);
                         intent.putExtra("comicsUrl", url);
                         intent.putExtra("episodeUrl", episodeUrl);
+                        intent.putExtra("title", comicsInfo.get(url));
                         startActivity(intent);
                     }
                     else{
                         intent = new Intent(getApplicationContext(), ComicsEpisodeActivity.class);
                         intent.putExtra("url", url);
+                        intent.putExtra("title", "");
                         startActivity(intent);
                         finish();
                     }
@@ -237,13 +244,6 @@ public class ComicsEpisodeActivity extends Activity {
             }catch (Exception e){
             }
         }
-    }
-
-    @Override
-    public boolean onMenuItemSelected(int featureId, MenuItem item) {
-        int itemId = item.getItemId();
-        Toast.makeText(ComicsEpisodeActivity.this, "" + itemId, Toast.LENGTH_SHORT).show();
-        return true;
     }
 
     @Override

@@ -15,7 +15,8 @@ import java.io.File;
 import java.util.ArrayList;
 
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Service.ComicsData;
+import ind.simsim.maruViewer.Model.ComicsData;
+import ind.simsim.maruViewer.Service.PreferencesManager;
 
 /**
  * Created by admin on 2016-02-15.
@@ -50,7 +51,6 @@ public class ComicsListAdapter extends BaseAdapter {
 
     public void setComicsData(ArrayList<ComicsData> comicsData){
         this.comicsData = comicsData;
-        notifyDataSetChanged();
     }
 
     public void refresh(){
@@ -71,11 +71,14 @@ public class ComicsListAdapter extends BaseAdapter {
             holder = (ViewHolder)convertView.getTag();
         }
 
-        if(comicsData.get(position).getImage().contains("storage"))
+        if(comicsData.get(position).getImage().contains(PreferencesManager.getInstance(mContext).getDownLoadDirectory()))
             Glide.with(mContext).load(Uri.fromFile(new File(comicsData.get(position).getImage()))).into(holder.icon);
+        else if(comicsData.get(position).getImage().contains("storage"))
+            Glide.with(mContext).load("http://wasabisyrup.com" + comicsData.get(position).getImage()).into(holder.icon);
         else
             Glide.with(mContext).load(comicsData.get(position).getImage()).into(holder.icon);
         holder.title.setText(comicsData.get(position).getTitle());
+        holder.title.setSelected(true);
 
         return convertView;
     }

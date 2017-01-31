@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingPrefix">
 
     <ImageView
         android:layout_marginLeft="10dp"
@@ -14,10 +17,17 @@
         android:id="@+id/icon" />
 
     <TextView
+        android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:gravity="center_vertical"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/title"
-        android:layout_gravity="center_horizontal" />
+        android:textSize="20sp"
+        android:textColor="#000000"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:focusable="false"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:layout_gravity="center_horizontal"
+        android:paddingRight="10dp"
+        app:font="custom5"/>
 </LinearLayout>

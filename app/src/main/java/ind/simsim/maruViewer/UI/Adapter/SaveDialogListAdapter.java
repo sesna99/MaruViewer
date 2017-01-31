@@ -11,7 +11,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Service.ComicsData;
+import ind.simsim.maruViewer.Model.ComicsData;
 
 /**
  * Created by jack on 2016. 12. 8..
@@ -82,6 +82,8 @@ public class SaveDialogListAdapter extends BaseAdapter {
     }
 
     public void setChecked(int position){
+        if(position != 0)
+            checked[0] = false;
         checked[position] = !checked[position];
     }
 

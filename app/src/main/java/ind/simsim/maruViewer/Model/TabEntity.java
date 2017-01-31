@@ -1,4 +1,4 @@
-package ind.simsim.maruViewer.Service;
+package ind.simsim.maruViewer.Model;
 
 import com.flyco.tablayout.listener.CustomTabEntity;
 

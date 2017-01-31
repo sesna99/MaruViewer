@@ -2,11 +2,5 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.actionview.ActionView" >
 
-    <item
-        android:title="search"
-        android:id="@+id/search"
-        android:icon="@drawable/abc_ic_search_api_mtrl_alpha"
-        android:showAsAction="always|collapseActionView"
-        android:actionViewClass="android.widget.SearchView" />
 
 </menu>

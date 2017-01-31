@@ -1,15 +1,11 @@
 package ind.simsim.maruViewer.UI.Fragment;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -25,7 +21,7 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Service.ComicsData;
+import ind.simsim.maruViewer.Model.ComicsData;
 import ind.simsim.maruViewer.UI.Activity.ComicsEpisodeActivity;
 import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
 
@@ -56,7 +52,7 @@ public class ComicsListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.list_fragment, container, false);
+        View v = inflater.inflate(R.layout.fragment_refresh_list, container, false);
         initList(v);
         return v;
     }
@@ -69,13 +65,13 @@ public class ComicsListFragment extends Fragment {
 
     private void initList(View v){
         mComicsList = (ListView)v.findViewById(R.id.listView);
-        adapter = new ComicsListAdapter(getActivity(), R.layout.list_item, new ArrayList<ComicsData>());
+        adapter = new ComicsListAdapter(getActivity(), R.layout.fragment_list_item, new ArrayList<ComicsData>());
 
         load = (SwipyRefreshLayout)v.findViewById(R.id.loadlist);
         load.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh(SwipyRefreshLayoutDirection swipyRefreshLayoutDirection) {
-                if(load.getDirection() == SwipyRefreshLayoutDirection.TOP) {
+                if(swipyRefreshLayoutDirection == SwipyRefreshLayoutDirection.TOP) {
                     order = 1;
                     comicsData = new ArrayList<>();
                 }
@@ -94,7 +90,7 @@ public class ComicsListFragment extends Fragment {
             }
         });
 
-       /* mComicsList.setOnTouchListener(new View.OnTouchListener() {
+      /*mComicsList.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()){

@@ -1,28 +1,30 @@
 package ind.simsim.maruViewer.UI.Activity;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
+import org.greenrobot.eventbus.EventBus;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -32,24 +34,38 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import ind.simsim.maruViewer.Event.DownLoadRemoveEvent;
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Service.ComicsData;
+import ind.simsim.maruViewer.Model.ComicsData;
 import ind.simsim.maruViewer.Service.ComicsSave;
 import ind.simsim.maruViewer.Service.PreferencesManager;
 
 /**
  * Created by admin on 2016-02-18.
  */
-public class ComicsViewer extends Activity {
-    private View mCustomView;
-    private ActionBar actionBar;
-    private ImageButton back, favorite, save;
-    private String comicsUrl, episodeUrl;
-    private TextView titleView;
+public class ComicsViewer extends BaseActivity {
+    @BindView(R.id.back_button)
+    ImageView back_button;
+
+    @BindView(R.id.title_view)
+    TextView title_view;
+
+    @BindView(R.id.save_button)
+    ImageView save_button;
+
+    @BindView(R.id.remove_view)
+    ImageView remove_view;
+
+    @BindView(R.id.favorite_button)
+    ImageView favorite_button;
+
+    private String comicsUrl, episodeUrl, title;
     private Intent intent;
     private File file;
     private FileWriter fw;
@@ -60,6 +76,7 @@ public class ComicsViewer extends Activity {
     private Context context;
     private int dWidth, dHeight;
     private ArrayList<ComicsData> comicsDatas;
+    private ArrayList<String> image;
     private SwipyRefreshLayout nextComics;
     private boolean isFirst = true;
     private PreferencesManager pm;
@@ -71,51 +88,26 @@ public class ComicsViewer extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comics);
 
+        ButterKnife.bind(this);
+
         context = this;
         intent = getIntent();
         comicsUrl = intent.getStringExtra("comicsUrl");
         episodeUrl = intent.getStringExtra("episodeUrl");
+        title = intent.getStringExtra("title");
         scroll = intent.getIntExtra("scroll", 0);
-        actionBar = getActionBar();
-        actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(false);
-
-        mCustomView = LayoutInflater.from(this).inflate(R.layout.custom_actionbar, null);
-        actionBar.setCustomView(mCustomView);
+        Log.i("Scroll", scroll+"");
 
         pm = PreferencesManager.getInstance(getApplicationContext());
 
-        back = (ImageButton) mCustomView.findViewById(R.id.back);
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        title_view.setText(title);
+        title_view.setSelected(true);
 
-        titleView = (TextView) mCustomView.findViewById(R.id.title);
-        titleView.setSelected(true);
-
-        favorite = (ImageButton) mCustomView.findViewById(R.id.favorite);
-        favorite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!comicsUrl.equals("")) {
-                    if (pm.searchFavorites("c", comicsUrl)) {
-                        pm.deleteFavorites(pm.getFavoritesPosition("c", comicsUrl));
-                        favorite.setBackgroundResource(R.drawable.star3);
-                    } else {
-                        pm.setFavorites(new ComicsData(titleView.getText().toString(), imageUrl, comicsUrl, episodeUrl), "c");
-                        favorite.setBackgroundResource(R.drawable.star4);
-                    }
-                } else
-                    Toast.makeText(context, "저장된 만화는 즐겨찾기가 불가능합니다.", Toast.LENGTH_SHORT).show();
-            }
-        });
+        back_button.setVisibility(View.VISIBLE);
 
         if (!comicsUrl.equals(""))
             if (pm.searchFavorites("c", comicsUrl))
-                favorite.setBackgroundResource(R.drawable.star4);
+                favorite_button.setBackgroundResource(R.drawable.star1);
 
 
         comicsDatas = new ArrayList<>();
@@ -136,18 +128,6 @@ public class ComicsViewer extends Activity {
             }
         });
 
-        final Activity activity = this;
-        save = (ImageButton) mCustomView.findViewById(R.id.save);
-        save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!comicsUrl.equals(""))
-                    new ComicsSave().save(activity, episodeUrl);
-                else
-                    Toast.makeText(activity, "저장된 만화는 저장이 불가능합니다.", Toast.LENGTH_SHORT).show();
-            }
-        });
-
         DisplayMetrics dm = getApplicationContext().getResources().getDisplayMetrics();
         dWidth = dm.widthPixels;
         dHeight = dm.heightPixels - 200;
@@ -162,14 +142,72 @@ public class ComicsViewer extends Activity {
         settings.setSupportZoom(true);
         settings.setLoadWithOverviewMode(true);
 
-        if (comicsUrl.equals(""))
+        if (comicsUrl.equals("")){
             createHtml();
-        else
+
+            remove_view.setVisibility(View.VISIBLE);
+            remove_view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    AlertDialog dialog = new AlertDialog.Builder(ComicsViewer.this)
+                            .setTitle("삭제")
+                            .setMessage("정말로 삭제하시겠습니까.")
+                            .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    removeComics();
+                                    finish();
+                                }
+                            })
+                            .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                }
+                            })
+                            .create();
+                    dialog.show();
+                }
+            });
+        }
+        else{
             new Comics().execute();
+
+            save_button.setVisibility(View.VISIBLE);
+            favorite_button.setVisibility(View.VISIBLE);
+
+            back_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+
+            favorite_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (pm.searchFavorites("c", comicsUrl)) {
+                        pm.deleteFavorites(pm.getFavoritesPosition("c", comicsUrl));
+                        favorite_button.setBackgroundResource(R.drawable.star3);
+                    } else {
+                        pm.setFavorites(new ComicsData(title_view.getText().toString(), imageUrl, comicsUrl, episodeUrl), "c");
+                        favorite_button.setBackgroundResource(R.drawable.star1);
+                    }
+                }
+            });
+
+            save_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (!comicsUrl.equals(""))
+                        new ComicsSave().save(ComicsViewer.this, episodeUrl);
+                }
+            });
+        }
     }
 
     class Comics extends AsyncTask<Void, Void, Void> {
-        private Elements image, title;
+        private Elements image;
         private StringBuilder html;
         private int size;
         private ProgressDialog dialog;
@@ -196,7 +234,6 @@ public class ComicsViewer extends Activity {
                 Document document = res.parse();
 
                 image = document.select("img");
-                title = document.select("title");
 
                 html = new StringBuilder();
                 html.append(getResources().getString(R.string.htmlStart));
@@ -212,8 +249,10 @@ public class ComicsViewer extends Activity {
                     }
                     width = dWidth;
                     height = dHeight;
-                    html.append("<img src=").append("http://wasabisyrup.com").append(image.get(i).attr("data-src")).append(" width=").append(width).append(" height=").append(height).append("/> ");
-                    Log.i("image", image.get(i).attr("data-src"));
+                    String imageUrl = "http://wasabisyrup.com" + image.get(i).attr("data-src").replaceAll(" ", "%20");
+                    html.append("<img src=").append(imageUrl).append(" width=").append(width).append(" height=").append(height).append("/> ");
+                    Log.i("image", imageUrl);
+                    //getImageSize(imageUrl);
                 }
                 html.append(getResources().getString(R.string.htmlEnd));
 
@@ -242,8 +281,6 @@ public class ComicsViewer extends Activity {
                 e.printStackTrace();
             }
 
-            String temp = title.get(0).text();
-            titleView.setText(temp.substring(0, temp.length() - 14));
             loadComics();
         }
     }
@@ -288,7 +325,7 @@ public class ComicsViewer extends Activity {
         StringBuilder html = new StringBuilder();
         html.append(getResources().getString(R.string.htmlStart));
 
-        ArrayList<String> image = intent.getStringArrayListExtra("image");
+        image = intent.getStringArrayListExtra("image");
         int size = image.size();
         for (int i = 0; i < size; i++)
             html.append("<img src=").append("\"file://" + image.get(i)).append("\" width=").append(dWidth).append(" height=").append(dHeight).append("/> ");
@@ -305,37 +342,56 @@ public class ComicsViewer extends Activity {
             e.printStackTrace();
         }
 
-        titleView.setText(intent.getStringExtra("title"));
+        title_view.setText(title);
         loadComics();
     }
 
     public void loadComics() {
         webView.loadUrl("file://" + path);
-        nextComics.setRefreshing(false);
-        if (!comicsUrl.equals("")) {
-            if (pm.searchLately(comicsUrl))
-                pm.deleteLately(pm.getLatelyPosition(comicsUrl));
-            pm.setLately(new ComicsData(titleView.getText().toString(), imageUrl, comicsUrl, episodeUrl), webView.getScrollY());
-        }
         webView.setScrollY(scroll);
+        scroll = 0;
+        nextComics.setRefreshing(false);
+        if (!comicsUrl.equals(""))
+            if (!pm.searchLately(comicsUrl))
+                pm.setLately(new ComicsData(title_view.getText().toString(), imageUrl, comicsUrl, episodeUrl), webView.getScrollY());
     }
 
     public void loadNextComics() {
         for (int i = 0; i < comicsDatas.size(); i++) {
-            Log.i("title", titleView.getText().toString());
-            Log.i("data", comicsDatas.get(i).getTitle());
-            if (titleView.getText().toString().equals(comicsDatas.get(i).getTitle())) {
+            if (title_view.getText().toString().equals(comicsDatas.get(i).getTitle())) {
                 if (i + 1 < comicsDatas.size()) {
                     if (!comicsDatas.get(i + 1).getTitle().contains("전편")) {
                         comicsUrl = comicsDatas.get(i + 1).getLink();
+                        title = comicsDatas.get(i + 1).getTitle();
+                        title_view.setText(title);
                         new Comics().execute();
+                        break;
                     } else {
+                        Toast.makeText(context, "마지막 화입니다", Toast.LENGTH_SHORT).show();
+                        nextComics.setRefreshing(false);
                         break;
                     }
                 }
+                Toast.makeText(context, "마지막 화입니다", Toast.LENGTH_SHORT).show();
+                nextComics.setRefreshing(false);
                 break;
             }
         }
+    }
+
+    public void removeComics() {
+        String root = "";
+        String temp[] = image.get(0).split("/");
+        for(int i = 0; i < temp.length - 1; i++)
+            root += temp[i] + "/";
+        File file = new File(root.substring(0, root.length() - 1));
+        Log.i("file", file.getAbsolutePath());
+        for(File childFile : file.listFiles()) {
+            Log.i("child", childFile.getAbsolutePath());
+            childFile.delete();
+        }
+        file.delete();    //root 삭제
+        EventBus.getDefault().post(new DownLoadRemoveEvent(true));
     }
 
     @Override
@@ -353,6 +409,9 @@ public class ComicsViewer extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (!comicsUrl.equals(""))
+            pm.updateLately(pm.getLatelyPosition(comicsUrl), webView.getScrollY());
+        webView = null;
         try {
             bw.close();
             fw.close();

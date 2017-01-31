@@ -10,13 +10,14 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
-import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 
+import ind.simsim.maruViewer.Event.FavoriteEvent;
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Service.ComicsData;
+import ind.simsim.maruViewer.Model.ComicsData;
 import ind.simsim.maruViewer.Service.PreferencesManager;
 import ind.simsim.maruViewer.UI.Activity.ComicsEpisodeActivity;
 import ind.simsim.maruViewer.UI.Activity.ComicsViewer;
@@ -30,7 +31,6 @@ public class FavoritesFragment extends Fragment {
     private ListView mComicsList;
     private ComicsListAdapter adapter;
     private ArrayList<ComicsData> comicsData;
-    private SwipyRefreshLayout refreshLayout;
     private PreferencesManager pm;
     private boolean isFirst = true;
 
@@ -44,33 +44,21 @@ public class FavoritesFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.list_fragment, container, false);
+        View v = inflater.inflate(R.layout.fragment_list, container, false);
         initList(v);
 
-        refreshLayout = (SwipyRefreshLayout) v.findViewById(R.id.loadlist);
-        refreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh(SwipyRefreshLayoutDirection direction) {
-                comicsData = pm.getFavorites();
-                adapter.setComicsData(comicsData);
-                refreshLayout.setRefreshing(false);
-            }
-        });
-
         isFirst = false;
+
+        EventBus.getDefault().register(this);
 
         return v;
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        refresh();
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
+
+        EventBus.getDefault().unregister(this);
     }
 
     private void initList(View v) {
@@ -79,7 +67,7 @@ public class FavoritesFragment extends Fragment {
         comicsData = new ArrayList<>();
 
         mComicsList = (ListView) v.findViewById(R.id.listView);
-        adapter = new ComicsListAdapter(getActivity(), R.layout.list_item, new ArrayList<ComicsData>());
+        adapter = new ComicsListAdapter(getActivity(), R.layout.fragment_list_item, new ArrayList<ComicsData>());
 
 
         mComicsList.setAdapter(adapter);
@@ -109,8 +97,15 @@ public class FavoritesFragment extends Fragment {
         if(!isFirst) {
             comicsData = pm.getFavorites();
             adapter.setComicsData(comicsData);
+            adapter.notifyDataSetChanged();
         }
     }
 
+    @Subscribe
+    public void onFavoriteEvent(FavoriteEvent event){
+        Log.i("event", event.isSucceed()+"");
+        if(event.isSucceed())
+            refresh();
+    }
 
 }

@@ -5,22 +5,19 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.os.Environment;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import org.greenrobot.eventbus.EventBus;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -31,6 +28,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
+import ind.simsim.maruViewer.Event.DownLoadEvent;
+import ind.simsim.maruViewer.Model.ComicsData;
 import ind.simsim.maruViewer.R;
 import ind.simsim.maruViewer.UI.Adapter.SaveDialogListAdapter;
 
@@ -57,7 +56,7 @@ public class ComicsSave {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 adapter.setChecked(i);
                 if(i == 0)
-                    adapter.setAllChecked(adapter.getChecked(i));
+                    adapter.setAllChecked(adapter.getChecked(0));
                 adapter.notifyDataSetChanged();
             }
         });
@@ -174,6 +173,7 @@ public class ComicsSave {
                         data.setImageName(j + ".jpg");
                         data.setImage("http://wasabisyrup.com" + image.get(j).attr("data-src"));
                         datas.add(data);
+                        Log.i("downimage", data.getImage());
                     }
                     dataArray.add(datas);
                 }
@@ -228,18 +228,18 @@ public class ComicsSave {
             InputStream in = null;
             OutputStream outStream = null;
             int progress = 0;
-            try {
-                for(int i = 0; i < data.size(); i++) {
-                    for(int j = 0; j < data.get(i).size(); j++) {
+            for(int i = 0; i < data.size(); i++) {
+                for(int j = 0; j < data.get(i).size(); j++) {
+                    try {
                         in = new java.net.URL(data.get(i).get(j).getImage()).openStream();
                         mBitmap = BitmapFactory.decodeStream(in);
                         in.close();
 
                         outStream = null;
-                        String path = Environment.getExternalStorageDirectory().toString() + "/마루뷰어/" + data.get(i).get(j).getTitle();
+                        String path = PreferencesManager.getInstance(activity).getDownLoadDirectory() + data.get(i).get(j).getTitle();
                         File file = new File(path);
-                        if( !file.exists() ){  // 원하는 경로에 폴더가 있는지 확인
-                            file.mkdirs();
+                        if(!file.exists()){  // 원하는 경로에 폴더가 있는지 확인
+                           file.mkdirs();
                         }
 
                         file = new File(path, data.get(i).get(j).getImageName());
@@ -251,9 +251,10 @@ public class ComicsSave {
                         float percent = increase * progress;
                         mBuilder.setContentText("다운로드 : " + String.format("%.0f", percent) + "%");
                         nm.notify(19980313, mBuilder.build());
+                    } catch (Exception ex) {
+                            ex.printStackTrace();
                     }
                 }
-            } catch (Exception ex) {
             }
             return null;
         }
@@ -261,6 +262,7 @@ public class ComicsSave {
         @Override
         protected void onPostExecute(Void mVoid) {
             nm.cancel(19980313);
+            EventBus.getDefault().post(new DownLoadEvent(true));
         }
     }
 }

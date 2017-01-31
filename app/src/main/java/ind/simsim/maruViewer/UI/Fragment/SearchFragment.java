@@ -9,10 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
-
-import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
-import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
+import android.widget.TextView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,8 +19,9 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Service.ComicsData;
+import ind.simsim.maruViewer.Model.ComicsData;
 import ind.simsim.maruViewer.UI.Activity.ComicsEpisodeActivity;
 import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
 
@@ -29,13 +29,18 @@ import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
  * Created by admin on 2016-02-18.
  */
 public class SearchFragment extends Fragment {
+    @BindView(R.id.navigation_menu)
+    ImageView navigation_menu;
+
+    @BindView(R.id.title_view)
+    TextView title_view;
+
     private ListView mComicsList;
     private String url;
     private ArrayList<ComicsData> comicsDatas;
     private ComicsListAdapter adapter;
     private Bundle bundle;
     private boolean isFirst = true;
-    private SwipyRefreshLayout layout;
 
     public SearchFragment() {
     }
@@ -49,16 +54,9 @@ public class SearchFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.list_fragment, container, false);
+        View v = inflater.inflate(R.layout.fragment_list, container, false);
         initList(v);
 
-        layout = (SwipyRefreshLayout) v.findViewById(R.id.loadlist);
-        layout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh(SwipyRefreshLayoutDirection direction) {
-                layout.setRefreshing(false);
-            }
-        });
         return v;
     }
 
@@ -71,13 +69,14 @@ public class SearchFragment extends Fragment {
         comicsDatas = new ArrayList<>();
 
         mComicsList = (ListView)v.findViewById(R.id.listView);
-        adapter = new ComicsListAdapter(getActivity(), R.layout.list_item, comicsDatas);
+        adapter = new ComicsListAdapter(getActivity(), R.layout.fragment_list_item, comicsDatas);
         mComicsList.setAdapter(adapter);
         mComicsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), ComicsEpisodeActivity.class);
                 intent.putExtra("url", comicsDatas.get(position).getLink());
+                intent.putExtra("title", comicsDatas.get(position).getTitle());
                 startActivity(intent);
             }
         });
