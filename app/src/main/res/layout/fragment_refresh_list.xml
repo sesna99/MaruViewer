@@ -7,7 +7,7 @@
     android:background="#ffffff">
 
     <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
-        android:id="@+id/loadlist"
+        android:id="@+id/load_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srl_direction="both">
@@ -15,7 +15,7 @@
         <ListView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/listView"
+            android:id="@+id/comics_list"
             android:layout_gravity="center_horizontal" />
 
     </com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>

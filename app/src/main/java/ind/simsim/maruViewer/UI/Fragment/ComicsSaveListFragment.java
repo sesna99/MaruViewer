@@ -16,6 +16,8 @@ import org.greenrobot.eventbus.Subscribe;
 import java.io.File;
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ind.simsim.maruViewer.Event.DownLoadEvent;
 import ind.simsim.maruViewer.Event.DownLoadRemoveEvent;
 import ind.simsim.maruViewer.R;
@@ -29,7 +31,9 @@ import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
  */
 
 public class ComicsSaveListFragment extends Fragment {
-    private ListView mComicsList;
+    @BindView(R.id.comics_list)
+    ListView comics_list;
+
     private ComicsListAdapter adapter;
     private ArrayList<ArrayList<String>> comicsData;
     private ArrayList<ComicsData> folderList;
@@ -46,6 +50,9 @@ public class ComicsSaveListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_list, container, false);
+
+        ButterKnife.bind(this, v);
+
         initList(v);
 
         isFirst = false;
@@ -62,12 +69,11 @@ public class ComicsSaveListFragment extends Fragment {
     }
 
     private void initList(View v){
-        mComicsList = (ListView)v.findViewById(R.id.listView);
         adapter = new ComicsListAdapter(getActivity(), R.layout.fragment_list_item, new ArrayList<ComicsData>());
 
 
-        mComicsList.setAdapter(adapter);
-        mComicsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        comics_list.setAdapter(adapter);
+        comics_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), ComicsViewer.class);

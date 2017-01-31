@@ -14,6 +14,8 @@ import com.bumptech.glide.Glide;
 import java.io.File;
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ind.simsim.maruViewer.R;
 import ind.simsim.maruViewer.Model.ComicsData;
 import ind.simsim.maruViewer.Service.PreferencesManager;
@@ -62,9 +64,7 @@ public class ComicsListAdapter extends BaseAdapter {
         ViewHolder holder;
         if(convertView == null){
             convertView = inflater.inflate(layout, parent, false);
-            holder = new ViewHolder();
-            holder.icon = (ImageView)convertView.findViewById(R.id.icon);
-            holder.title = (TextView)convertView.findViewById(R.id.title);
+            holder = new ViewHolder(convertView);
             convertView.setTag(holder);
         }
         else{
@@ -84,8 +84,15 @@ public class ComicsListAdapter extends BaseAdapter {
     }
 
     class ViewHolder{
+        @BindView(R.id.icon)
         ImageView icon;
+
+        @BindView(R.id.title)
         TextView title;
+
+        public ViewHolder(View v) {
+            ButterKnife.bind(this, v);
+        }
     }
 }
 

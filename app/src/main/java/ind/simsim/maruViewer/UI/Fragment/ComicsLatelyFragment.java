@@ -14,6 +14,8 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ind.simsim.maruViewer.Event.LatelyEvent;
 import ind.simsim.maruViewer.R;
 import ind.simsim.maruViewer.Model.ComicsData;
@@ -25,7 +27,9 @@ import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
  * Created by jack on 2016. 12. 16..
  */
 public class ComicsLatelyFragment extends Fragment {
-    private ListView mComicsList;
+    @BindView(R.id.comics_list)
+    ListView comics_list;
+
     private ComicsListAdapter adapter;
     private ArrayList<ComicsData> comicsData;
     private PreferencesManager pm;
@@ -42,6 +46,9 @@ public class ComicsLatelyFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_list, container, false);
+
+        ButterKnife.bind(this, v);
+
         initList(v);
 
         isFirst = false;
@@ -63,11 +70,10 @@ public class ComicsLatelyFragment extends Fragment {
 
         comicsData = new ArrayList<>();
 
-        mComicsList = (ListView)v.findViewById(R.id.listView);
         adapter = new ComicsListAdapter(getActivity(), R.layout.fragment_list_item, new ArrayList<ComicsData>());
 
-        mComicsList.setAdapter(adapter);
-        mComicsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        comics_list.setAdapter(adapter);
+        comics_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = null;

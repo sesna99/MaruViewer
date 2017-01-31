@@ -20,6 +20,7 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import ind.simsim.maruViewer.R;
 import ind.simsim.maruViewer.Model.ComicsData;
 import ind.simsim.maruViewer.UI.Activity.ComicsEpisodeActivity;
@@ -29,13 +30,9 @@ import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
  * Created by admin on 2016-02-18.
  */
 public class SearchFragment extends Fragment {
-    @BindView(R.id.navigation_menu)
-    ImageView navigation_menu;
+    @BindView(R.id.comics_list)
+    ListView comics_list;
 
-    @BindView(R.id.title_view)
-    TextView title_view;
-
-    private ListView mComicsList;
     private String url;
     private ArrayList<ComicsData> comicsDatas;
     private ComicsListAdapter adapter;
@@ -55,6 +52,9 @@ public class SearchFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_list, container, false);
+
+        ButterKnife.bind(this, v);
+
         initList(v);
 
         return v;
@@ -68,10 +68,9 @@ public class SearchFragment extends Fragment {
     private void initList(View v){
         comicsDatas = new ArrayList<>();
 
-        mComicsList = (ListView)v.findViewById(R.id.listView);
         adapter = new ComicsListAdapter(getActivity(), R.layout.fragment_list_item, comicsDatas);
-        mComicsList.setAdapter(adapter);
-        mComicsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        comics_list.setAdapter(adapter);
+        comics_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), ComicsEpisodeActivity.class);

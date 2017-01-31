@@ -65,13 +65,14 @@ public class ComicsViewer extends BaseActivity {
     @BindView(R.id.favorite_button)
     ImageView favorite_button;
 
-    private String comicsUrl, episodeUrl, title;
+    @BindView(R.id.webView)
+    WebView webView;
+
+    private String comicsUrl, episodeUrl, imageUrl, title, path;
     private Intent intent;
     private File file;
     private FileWriter fw;
     private BufferedWriter bw;
-    private String path;
-    private WebView webView;
     private WebSettings settings;
     private Context context;
     private int dWidth, dHeight;
@@ -80,7 +81,6 @@ public class ComicsViewer extends BaseActivity {
     private SwipyRefreshLayout nextComics;
     private boolean isFirst = true;
     private PreferencesManager pm;
-    private String imageUrl;
     private int scroll;
 
     @Override
@@ -132,7 +132,6 @@ public class ComicsViewer extends BaseActivity {
         dWidth = dm.widthPixels;
         dHeight = dm.heightPixels - 200;
 
-        webView = (WebView) findViewById(R.id.webView);
         webView.setWebViewClient(new WebViewClient());
 
         settings = webView.getSettings();

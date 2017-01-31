@@ -50,21 +50,20 @@ public class ComicsEpisodeActivity extends BaseActivity {
     @BindView(R.id.favorite_button)
     ImageView favorite_button;
 
+    @BindView(R.id.webView)
+    WebView webView;
+
     private Episode task;
-    private String episodeUrl;
     private int dWidth, dHeight;
     private Intent intent;
     private Context mContext;
-    private WebView webView;
     private WebSettings settings;
     private File file;
     private FileWriter fw;
     private BufferedWriter bw;
-    private String path;
     private StringBuilder html;
-    private String title;
+    private String title, imageUrl, episodeUrl, path;
     private PreferencesManager pm;
-    private String imageUrl;
     private ArrayList<String> episode;
     private Map<String, String> comicsInfo;
 
@@ -134,7 +133,6 @@ public class ComicsEpisodeActivity extends BaseActivity {
 
         mContext = this;
 
-        webView = (WebView) findViewById(R.id.webView);
         webView.setWebViewClient(new CustomWebViewClient());
         settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);

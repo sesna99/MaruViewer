@@ -52,7 +52,9 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.navigation_view)
     NavigationView navigation_view;
 
-    private ViewPager mViewPager;
+    @BindView(R.id.container)
+    ViewPager container;
+
     private PageAdapter adapter;
     private CommonTabLayout tabLayout;
     private ArrayList<CustomTabEntity> tabEntities;
@@ -107,8 +109,8 @@ public class MainActivity extends BaseActivity {
         });
 
         adapter = new PageAdapter(getApplicationContext(), getFragmentManager(), 5);
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(adapter);
+        container = (ViewPager) findViewById(R.id.container);
+        container.setAdapter(adapter);
 
         tabEntities = new ArrayList<>();
         for (int i = 0; i < selectImg.length; i++)
@@ -117,7 +119,7 @@ public class MainActivity extends BaseActivity {
         tabLayout = (CommonTabLayout) findViewById(R.id.tabs);
         tabLayout.setTabData(tabEntities);
 
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        container.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -138,7 +140,7 @@ public class MainActivity extends BaseActivity {
         tabLayout.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
             public void onTabSelect(int position) {
-                mViewPager.setCurrentItem(position);
+                container.setCurrentItem(position);
             }
 
             @Override
@@ -230,7 +232,7 @@ public class MainActivity extends BaseActivity {
                 intent.putExtra("position", position);
                 startActivity(intent);
             } else {
-                mViewPager.setCurrentItem(0);
+                container.setCurrentItem(0);
                 tabLayout.setCurrentTab(0);
             }
         }

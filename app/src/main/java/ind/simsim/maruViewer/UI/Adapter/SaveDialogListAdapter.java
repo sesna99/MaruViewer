@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ind.simsim.maruViewer.R;
 import ind.simsim.maruViewer.Model.ComicsData;
 
@@ -53,9 +55,7 @@ public class SaveDialogListAdapter extends BaseAdapter {
     public View getView(final int i, View view, ViewGroup viewGroup) {
         if(view == null) {
             view = inflater.inflate(R.layout.save_dialog_item, null);
-            viewHolder = new ViewHolder();
-            viewHolder.checkBox = (CheckBox) view.findViewById(R.id.checkbox);
-            viewHolder.episode = (TextView) view.findViewById(R.id.episode);
+            viewHolder = new ViewHolder(view);
             view.setTag(viewHolder);
         }
         else{
@@ -93,7 +93,14 @@ public class SaveDialogListAdapter extends BaseAdapter {
     }
 
     class ViewHolder {
+        @BindView(R.id.checkbox)
         CheckBox checkBox;
+
+        @BindView(R.id.episode)
         TextView episode;
+
+        public ViewHolder(View v) {
+            ButterKnife.bind(this, v);
+        }
     }
 }

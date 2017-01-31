@@ -20,6 +20,8 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ind.simsim.maruViewer.R;
 import ind.simsim.maruViewer.Model.ComicsData;
 import ind.simsim.maruViewer.UI.Activity.ComicsEpisodeActivity;
@@ -29,13 +31,17 @@ import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
  * Created by admin on 2016-02-18.
  */
 public class ComicsListFragment extends Fragment {
-    private ListView mComicsList;
+    @BindView(R.id.comics_list)
+    ListView comics_list;
+
+    @BindView(R.id.load_list)
+    SwipyRefreshLayout load_list;
+
     private String url;
     private ArrayList<ComicsData> comicsData;
     private ComicsListAdapter adapter;
     private int order = 1;
     private Bundle bundle;
-    private SwipyRefreshLayout load;
     private boolean isFirst;
     private float oldY = 0, curY = 0;
 
@@ -53,7 +59,11 @@ public class ComicsListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_refresh_list, container, false);
+
+        ButterKnife.bind(this, v);
+
         initList(v);
+
         return v;
     }
 
@@ -64,11 +74,9 @@ public class ComicsListFragment extends Fragment {
     }
 
     private void initList(View v){
-        mComicsList = (ListView)v.findViewById(R.id.listView);
         adapter = new ComicsListAdapter(getActivity(), R.layout.fragment_list_item, new ArrayList<ComicsData>());
 
-        load = (SwipyRefreshLayout)v.findViewById(R.id.loadlist);
-        load.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
+        load_list.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh(SwipyRefreshLayoutDirection swipyRefreshLayoutDirection) {
                 if(swipyRefreshLayoutDirection == SwipyRefreshLayoutDirection.TOP) {
@@ -79,8 +87,8 @@ public class ComicsListFragment extends Fragment {
             }
         });
 
-        mComicsList.setAdapter(adapter);
-        mComicsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        comics_list.setAdapter(adapter);
+        comics_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), ComicsEpisodeActivity.class);
@@ -89,29 +97,6 @@ public class ComicsListFragment extends Fragment {
                 startActivity(intent);
             }
         });
-
-      /*mComicsList.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()){
-                    case MotionEvent.ACTION_MOVE:
-                        if(oldY == 0) {
-                            oldY = motionEvent.getRawY();
-                        }
-                        curY = motionEvent.getRawY();
-                        if(curY > oldY)
-                            load.setDirection(SwipyRefreshLayoutDirection.TOP);
-                        else
-                            load.setDirection(SwipyRefreshLayoutDirection.BOTTOM);
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        oldY = 0;
-                        curY = 0;
-                        break;
-                }
-                return false;
-            }
-        });*/
 
 
     }
@@ -182,7 +167,7 @@ public class ComicsListFragment extends Fragment {
             }
             adapter.setComicsData(comicsData);
             adapter.refresh();
-            load.setRefreshing(false);
+            load_list.setRefreshing(false);
         }
     }
 }
