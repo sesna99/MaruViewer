@@ -16,6 +16,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.webkit.CookieManager;
 import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
@@ -52,6 +53,8 @@ public class UpdateCheck {
         Uri downloadUri = Uri.parse(url);
         downloadManager = (DownloadManager) activity.getSystemService(Context.DOWNLOAD_SERVICE);
         request = new DownloadManager.Request(downloadUri);
+        String cookie = CookieManager.getInstance().getCookie(url);
+        request.addRequestHeader("Cookie", cookie);
         request.setTitle("마루뷰어");
         request.setDescription("업데이트");
 
