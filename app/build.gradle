@@ -8,8 +8,8 @@ android {
         applicationId "indvidual.simsim.maruViewer"
         minSdkVersion 18
         targetSdkVersion 25
-        versionCode 6
-        versionName "4.1"
+        versionCode 7
+        versionName "4.2"
     }
     buildTypes {
         release {
