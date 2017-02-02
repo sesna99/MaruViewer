@@ -120,6 +120,7 @@ public class UpdateCheck {
                                 intent.putExtra("code", 2);
                                 intent.putExtra("url", downLink);
                                 context.startService(intent);
+                                activity.finish();
                             }
                         })
                         .setNegativeButton("취소", new DialogInterface.OnClickListener() {

@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.IBinder;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
@@ -230,7 +231,9 @@ public class DownloadService extends Service {
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        intent.setDataAndType(FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getPackageName() + ".provider", apkFile), "application/vnd.android.package-archive");
 
         getApplicationContext().startActivity(intent);
     }
