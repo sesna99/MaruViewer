@@ -4,10 +4,10 @@ package ind.simsim.maruViewer.Event;
  * Created by jack on 2017. 1. 25..
  */
 
-public class DownLoadEvent {
+public class DownLoadCompleteEvent {
     private boolean succeed;
 
-    public DownLoadEvent(boolean succeed) {
+    public DownLoadCompleteEvent(boolean succeed) {
         this.succeed = succeed;
     }
 

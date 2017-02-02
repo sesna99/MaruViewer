@@ -3,6 +3,8 @@ package ind.simsim.maruViewer.Service;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
@@ -15,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.widget.Toast;
@@ -26,9 +29,14 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import ind.simsim.maruViewer.Event.UpdateEvent;
+import ind.simsim.maruViewer.R;
 import ind.simsim.maruViewer.UI.Activity.MainActivity;
 
 /**
@@ -37,53 +45,19 @@ import ind.simsim.maruViewer.UI.Activity.MainActivity;
 
 public class UpdateCheck {
     private Activity activity;
+    private Context context;
     private long downloadID;
     private DownloadManager downloadManager;
     private DownloadManager.Request request;
 
     public UpdateCheck(Activity activity) {
         this.activity = activity;
+        context = activity.getApplicationContext();
     }
 
     public void check(){
         new Version().execute();
     }
-
-    public void download(String url) {
-        Uri downloadUri = Uri.parse(url);
-        downloadManager = (DownloadManager) activity.getSystemService(Context.DOWNLOAD_SERVICE);
-        request = new DownloadManager.Request(downloadUri);
-        String cookie = CookieManager.getInstance().getCookie(url);
-        request.addRequestHeader("Cookie", cookie);
-        request.setTitle("마루뷰어");
-        request.setDescription("업데이트");
-
-        downloadID = downloadManager.enqueue(request);
-
-        activity.registerReceiver(downloadReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-        activity.finish();
-    }
-
-    private BroadcastReceiver downloadReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            DownloadManager.Query query = new DownloadManager.Query();
-            query.setFilterById(downloadID);
-
-            Cursor cursor = downloadManager.query(query);
-            if(cursor.moveToFirst()){
-                int columnIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS);
-                int status = cursor.getInt(columnIndex);
-                if(status == DownloadManager.STATUS_SUCCESSFUL){
-                    int localFileNameId = cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME);
-                    Intent openApk = new Intent(Intent.ACTION_VIEW);
-                    openApk.setDataAndType(Uri.fromFile(new File(cursor.getString(localFileNameId))),"application/vnd.android.package-archive");
-                    openApk.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    activity.startActivity(openApk);
-                }
-            }
-        }
-    };
 
     class Version extends AsyncTask<Void, Void, Void> {
         private ProgressDialog dialog;
@@ -141,7 +115,11 @@ public class UpdateCheck {
                         .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                download(downLink);
+                                //download(downLink);
+                                Intent intent = new Intent(context, DownloadService.class);
+                                intent.putExtra("code", 2);
+                                intent.putExtra("url", downLink);
+                                context.startService(intent);
                             }
                         })
                         .setNegativeButton("취소", new DialogInterface.OnClickListener() {

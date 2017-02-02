@@ -7,7 +7,7 @@
     tools:ignore="MissingPrefix">
 
     <EditText
-        android:id="@+id/search_text"
+        android:id="@+id/edit_text"
         android:layout_width="280dp"
         android:layout_height="wrap_content"
         android:textColor="#000000"

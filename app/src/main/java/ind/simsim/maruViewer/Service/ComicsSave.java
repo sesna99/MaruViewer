@@ -3,15 +3,10 @@ package ind.simsim.maruViewer.Service;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.Intent;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -22,13 +17,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 
-import ind.simsim.maruViewer.Event.DownLoadEvent;
+import ind.simsim.maruViewer.Event.ComicsDownLoadEvent;
 import ind.simsim.maruViewer.Model.ComicsData;
 import ind.simsim.maruViewer.R;
 import ind.simsim.maruViewer.UI.Adapter.SaveDialogListAdapter;
@@ -39,6 +30,8 @@ import ind.simsim.maruViewer.UI.Adapter.SaveDialogListAdapter;
 
 public class ComicsSave {
     private Activity activity;
+    private ArrayList<ArrayList<ComicsData>> saveComics;
+
     public void save(Activity activity, String url){
         this.activity = activity;
         new Episode().execute(url);
@@ -66,6 +59,9 @@ public class ComicsSave {
         builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
+                Intent intent = new Intent(activity, DownloadService.class);
+                intent.putExtra("code", 1);
+                activity.startService(intent);
                 new Comics().execute(adapter.getCheckedData());
             }
         }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
@@ -134,7 +130,6 @@ public class ComicsSave {
         private Elements image, title;
         private int size;
         private ArrayList<ComicsData> saveData;
-        private ArrayList<ArrayList<ComicsData>> dataArray;
         private Document document;
         private ProgressDialog dialog;
 
@@ -151,7 +146,7 @@ public class ComicsSave {
         @Override
         protected Void doInBackground(ArrayList<ComicsData>... params) {
             saveData = params[0];
-            dataArray = new ArrayList<>();
+            saveComics = new ArrayList<>();
             ComicsData data;
             ArrayList<ComicsData> datas;
 
@@ -173,9 +168,8 @@ public class ComicsSave {
                         data.setImageName(j + ".jpg");
                         data.setImage("http://wasabisyrup.com" + image.get(j).attr("data-src"));
                         datas.add(data);
-                        Log.i("downimage", data.getImage());
                     }
-                    dataArray.add(datas);
+                    saveComics.add(datas);
                 }
 
                 document = null;
@@ -188,81 +182,8 @@ public class ComicsSave {
         @Override
         protected void onPostExecute(Void mVoid) {
             dialog.dismiss();
-            new Save().execute(dataArray);
-        }
-    }
 
-    class Save extends AsyncTask<ArrayList<ArrayList<ComicsData>>, Void, Void>{
-        private ArrayList<ArrayList<ComicsData>> data;
-        private int max = 0;
-        private NotificationManager nm;
-        private Notification.Builder mBuilder;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            nm = (NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
-
-            mBuilder = new Notification.Builder(activity);
-            mBuilder.setSmallIcon(R.drawable.ic_launcher);
-            mBuilder.setTicker("다운로드중...");
-            mBuilder.setWhen(System.currentTimeMillis());
-            mBuilder.setContentTitle("마루뷰어");
-            mBuilder.setAutoCancel(true);
-            mBuilder.setOngoing(true);
-
-        }
-
-        @Override
-        protected Void doInBackground(ArrayList<ArrayList<ComicsData>>... params) {
-            data = params[0];
-
-            for(int i = 0; i < data.size(); i++){
-                max += data.get(i).size();
-            }
-            float increase = 100;
-            increase = increase/max;
-
-            Bitmap mBitmap = null;
-            InputStream in = null;
-            OutputStream outStream = null;
-            int progress = 0;
-            for(int i = 0; i < data.size(); i++) {
-                for(int j = 0; j < data.get(i).size(); j++) {
-                    try {
-                        in = new java.net.URL(data.get(i).get(j).getImage()).openStream();
-                        mBitmap = BitmapFactory.decodeStream(in);
-                        in.close();
-
-                        outStream = null;
-                        String path = PreferencesManager.getInstance(activity).getDownLoadDirectory() + data.get(i).get(j).getTitle();
-                        File file = new File(path);
-                        if(!file.exists()){  // 원하는 경로에 폴더가 있는지 확인
-                           file.mkdirs();
-                        }
-
-                        file = new File(path, data.get(i).get(j).getImageName());
-                        outStream = new FileOutputStream(file);
-                        mBitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream);
-                        outStream.flush();
-                        outStream.close();
-                        mBuilder.setProgress(max, ++progress, false);
-                        float percent = increase * progress;
-                        mBuilder.setContentText("다운로드 : " + String.format("%.0f", percent) + "%");
-                        nm.notify(19980313, mBuilder.build());
-                    } catch (Exception ex) {
-                            ex.printStackTrace();
-                    }
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void mVoid) {
-            nm.cancel(19980313);
-            EventBus.getDefault().post(new DownLoadEvent(true));
+            EventBus.getDefault().post(new ComicsDownLoadEvent(saveComics));
         }
     }
 }

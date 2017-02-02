@@ -1,6 +1,8 @@
 package ind.simsim.maruViewer.UI.Fragment;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -12,6 +14,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -19,6 +22,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ind.simsim.maruViewer.R;
 import ind.simsim.maruViewer.Service.PreferencesManager;
+import ind.simsim.maruViewer.UI.Activity.ComicsListActivity;
+import ind.simsim.maruViewer.UI.Activity.MainActivity;
 
 /**
  * Created by jack on 2017. 1. 24..
@@ -58,6 +63,33 @@ public class SettingFragment extends Fragment {
 
     public void init(){
         download_directory_text.setText(PreferencesManager.getInstance(getActivity()).getDownLoadDirectory());
+        download_directory_text.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final View v = getActivity().getLayoutInflater().inflate(R.layout.edit_dialog, null);
+                final EditText editText = (EditText)v.findViewById(R.id.edit_text);
+                editText.setText(PreferencesManager.getInstance(getActivity()).getDownLoadDirectory());
+                AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                        .setView(v)
+                        .setTitle("검색")
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                PreferencesManager.getInstance(getActivity()).setDownLoadDirectory(editText.getText().toString());
+                                download_directory_text.setText(editText.getText().toString());
+                            }
+                        })
+                        .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        })
+                        .create();
+                dialog.show();
+            }
+        });
+
         PackageInfo pInfo = null;
         try {
             pInfo = getActivity().getPackageManager().getPackageInfo(

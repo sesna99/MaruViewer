@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import ind.simsim.maruViewer.Event.DownLoadEvent;
+import ind.simsim.maruViewer.Event.DownLoadCompleteEvent;
 import ind.simsim.maruViewer.Event.DownLoadRemoveEvent;
 import ind.simsim.maruViewer.R;
 import ind.simsim.maruViewer.Model.ComicsData;
@@ -70,8 +70,6 @@ public class ComicsSaveListFragment extends Fragment {
 
     private void initList(View v){
         adapter = new ComicsListAdapter(getActivity(), R.layout.fragment_list_item, new ArrayList<ComicsData>());
-
-
         comics_list.setAdapter(adapter);
         comics_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -118,10 +116,11 @@ public class ComicsSaveListFragment extends Fragment {
                 path = folderList.get(i).getLink();
                 file = new File(path);
                 files = file.listFiles();
-                folderList.get(i).setImage(files[0].getAbsolutePath());
+                folderList.get(i).setImage(files.length > 0 ? files[0].getAbsolutePath() : "");
             }
             return folderList;
         } catch(Exception e ) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -143,6 +142,7 @@ public class ComicsSaveListFragment extends Fragment {
                 comicsData.add(image);
             }
         } catch(Exception e ) {
+            e.printStackTrace();
         }
     }
 
@@ -157,7 +157,7 @@ public class ComicsSaveListFragment extends Fragment {
     }
 
     @Subscribe
-    public void onDownLoadEvent(DownLoadEvent event){
+    public void onDownLoadCompleteEvent(DownLoadCompleteEvent event){
         if(event.isSucceed())
             refresh();
     }

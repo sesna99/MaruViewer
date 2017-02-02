@@ -83,7 +83,7 @@ public class MainActivity extends BaseActivity {
         search_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final View v = getLayoutInflater().inflate(R.layout.search_dialog, null);
+                final View v = getLayoutInflater().inflate(R.layout.edit_dialog, null);
                 AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
                         .setView(v)
                         .setTitle("검색")
@@ -92,7 +92,7 @@ public class MainActivity extends BaseActivity {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 Intent intent = new Intent(MainActivity.this, ComicsListActivity.class);
                                 intent.putExtra("position", -1);
-                                intent.putExtra("url", getString(R.string.search, ((EditText)v.findViewById(R.id.search_text)).getText().toString()));
+                                intent.putExtra("url", getString(R.string.search, ((EditText)v.findViewById(R.id.edit_text)).getText().toString()));
                                 intent.putExtra("category", "검색");
                                 startActivity(intent);
                             }
