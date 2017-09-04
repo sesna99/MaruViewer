@@ -86,31 +86,17 @@
         android:orientation="vertical"
         android:background="@drawable/thin_border">
 
-        <LinearLayout
+        <TextView
             android:id="@+id/kakao"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:text="오픈 카카오톡 참여"
+            android:textSize="15sp"
+            android:textColor="#000000"
+            android:background="?android:attr/selectableItemBackground"
             android:paddingTop="15dp"
             android:paddingBottom="15dp"
-            android:paddingLeft="10dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="카카오톡"
-                android:textSize="15sp"
-                android:textColor="#000000"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="trycatch98"
-                android:textColor="#959595"/>
-
-        </LinearLayout>
+            android:paddingLeft="10dp"/>
 
     </LinearLayout>
 

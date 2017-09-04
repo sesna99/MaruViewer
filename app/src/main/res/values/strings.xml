@@ -28,7 +28,9 @@
         <item>SF</item>
         <item>TS</item>
         <item>개그</item>
+        <item>게임</item>
         <item>드라마</item>
+        <item>라노벨</item>
         <item>러브코미디</item>
         <item>먹방</item>
         <item>백합</item>
@@ -37,8 +39,11 @@
         <item>스릴러</item>
         <item>스포츠</item>
         <item>시대</item>
+        <item>애니화</item>
         <item>액션</item>
-        <item>일상 치유</item>
+        <item>이세계</item>
+        <item>일상+치유</item>
+        <item>전생</item>
         <item>추리</item>
         <item>판타지</item>
         <item>학원</item>
@@ -65,7 +70,9 @@
         <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3ASF<![CDATA[&]]>p=</item>
         <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3ATS<![CDATA[&]]>p=</item>
         <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A개그<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A게임<![CDATA[&]]>p=</item>
         <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A드라마<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A라노벨<![CDATA[&]]>p=</item>
         <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A러브코미디<![CDATA[&]]>p=</item>
         <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A먹방<![CDATA[&]]>p=</item>
         <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A백합<![CDATA[&]]>p=</item>
@@ -74,8 +81,11 @@
         <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A스릴러<![CDATA[&]]>p=</item>
         <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A스포츠<![CDATA[&]]>p=</item>
         <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A시대<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A애니화<![CDATA[&]]>p=</item>
         <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A액션<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A이세계<![CDATA[&]]>p=</item>
         <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A일상+치유<![CDATA[&]]>p=</item>
+        <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A전생<![CDATA[&]]>p=</item>
         <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A추리<![CDATA[&]]>p=</item>
         <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A판타지<![CDATA[&]]>p=</item>
         <item>http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A학원<![CDATA[&]]>p=</item>
@@ -84,5 +94,9 @@
     <string name="search">http://marumaru.in/?r=home<![CDATA[&]]>mod=search<![CDATA[&]]>keyword=%1$s</string>
     <string name="htmlStart" formatted="false">"<![CDATA[<html><head><style>img{margin-left:20px; margin-right:20px; margin-bottom:25px;}</style></head><body><center><p>]]>"</string>
     <string name="htmlEnd"><![CDATA[</p></center></body></html>]]></string>
-    <string name="banner_ad_unit_id">ca-app-pub-3970497590731166/4514197737</string>
+    <string name="app_id">ca-app-pub-1333902887702426</string>
+    <string name="banner_ad_unit_id">ca-app-pub-1333902887702426/3643671439</string>
+    <string name="banner_test_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="native_ad_unit_id">ca-app-pub-1333902887702426/7964515232</string>
+    <string name="native_test_ad_unit_id">ca-app-pub-3940256099942544/2793859312</string>
 </resources>

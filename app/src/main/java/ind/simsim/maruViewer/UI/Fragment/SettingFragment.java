@@ -42,6 +42,9 @@ public class SettingFragment extends Fragment {
     @BindView(R.id.clear_lately)
     TextView clear_lately;
 
+    @BindView(R.id.kakao)
+    TextView kakao;
+
     @BindView(R.id.update)
     LinearLayout update;
 
@@ -114,6 +117,14 @@ public class SettingFragment extends Fragment {
                     PreferencesManager.getInstance(getActivity()).deleteLately(i);
                     size = PreferencesManager.getInstance(getActivity()).getPosition("lately") - 1;
                 }
+            }
+        });
+
+        kakao.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://open.kakao.com/o/g3SsVZw"));
+                startActivity(intent);
             }
         });
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,6 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.NativeExpressAdView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,20 +27,25 @@ import ind.simsim.maruViewer.Model.ComicsModel;
 import ind.simsim.maruViewer.R;
 import ind.simsim.maruViewer.Service.PreferencesManager;
 import ind.simsim.maruViewer.UI.Activity.ComicsEpisodeActivity;
+import ind.simsim.maruViewer.UI.Activity.ComicsViewer;
 
 /**
  * Created by trycatch on 2017. 9. 4..
  */
 
-public class ComicsListAdapter extends RecyclerView.Adapter {
+public class ComicsSaveListAdapter extends RecyclerView.Adapter {
     private Context mContext;
     private ArrayList<ComicsModel> comicsModel;
+    private ArrayList<ComicsModel> folderList;
+    private ArrayList<ArrayList<String>> comicsData;
     private LayoutInflater inflater;
-    private int AD_POSITION = 7;
+    private int AD_POSITION = 4;
 
-    public ComicsListAdapter(Context mContext, ArrayList<ComicsModel> comicsModel) {
+    public ComicsSaveListAdapter(Context mContext, ArrayList<ComicsModel> comicsModel, ArrayList<ComicsModel> folderList, ArrayList<ArrayList<String>> comicsData) {
         this.mContext = mContext;
         this.comicsModel = comicsModel;
+        this.folderList = folderList;
+        this.comicsData = comicsData;
         inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -67,19 +72,20 @@ public class ComicsListAdapter extends RecyclerView.Adapter {
         int viewType = getItemViewType(position);
         if(viewType != 0){
             ContentViewHolder contentViewHolder = (ContentViewHolder) holder;
-            if (comicsModel.get(position).getImage().contains("storage"))
-                Glide.with(mContext).load("http://wasabisyrup.com" + comicsModel.get(position).getImage()).into(contentViewHolder.icon);
-            else
-                Glide.with(mContext).load(comicsModel.get(position).getImage()).into(contentViewHolder.icon);
+            if (comicsModel.get(position).getImage().contains(PreferencesManager.getInstance(mContext).getDownLoadDirectory()))
+                Glide.with(mContext).load(Uri.fromFile(new File(comicsModel.get(position).getImage()))).into(contentViewHolder.icon);
             contentViewHolder.title.setText(comicsModel.get(position).getTitle());
             contentViewHolder.title.setSelected(true);
             contentViewHolder.item_view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(mContext, ComicsEpisodeActivity.class);
-                    intent.putExtra("url", comicsModel.get(position).getLink());
-                    intent.putExtra("title", comicsModel.get(position).getTitle());
+                    Intent intent = new Intent(mContext, ComicsViewer.class);
+                    intent.putExtra("image", comicsData.get(position));
+                    intent.putExtra("title", folderList.get(position).getTitle());
+                    intent.putExtra("comicsUrl", "");
+                    intent.putExtra("episodeUrl", "");
                     mContext.startActivity(intent);
+                    Log.i("path", comicsData.get(position).get(0));
                 }
             });
         }
@@ -104,7 +110,6 @@ public class ComicsListAdapter extends RecyclerView.Adapter {
 
     public void setComicsModel(ArrayList<ComicsModel> comicsModel){
         this.comicsModel = comicsModel;
-
         notifyDataSetChanged();
     }
 

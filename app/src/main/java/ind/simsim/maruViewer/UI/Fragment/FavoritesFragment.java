@@ -3,6 +3,9 @@ package ind.simsim.maruViewer.UI.Fragment;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,11 +22,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ind.simsim.maruViewer.Event.FavoriteEvent;
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Model.ComicsData;
+import ind.simsim.maruViewer.Model.ComicsModel;
 import ind.simsim.maruViewer.Service.PreferencesManager;
 import ind.simsim.maruViewer.UI.Activity.ComicsEpisodeActivity;
 import ind.simsim.maruViewer.UI.Activity.ComicsViewer;
-import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
+import ind.simsim.maruViewer.UI.Adapter.FavoritesListAdapter;
 
 /**
  * Created by jack on 2016. 12. 16..
@@ -31,10 +34,10 @@ import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
 
 public class FavoritesFragment extends Fragment {
     @BindView(R.id.comics_list)
-    ListView comics_list;
+    RecyclerView comics_list;
 
-    private ComicsListAdapter adapter;
-    private ArrayList<ComicsData> comicsData;
+    private FavoritesListAdapter adapter;
+    private ArrayList<ComicsModel> comicsModel;
     private PreferencesManager pm;
     private boolean isFirst = true;
 
@@ -71,39 +74,21 @@ public class FavoritesFragment extends Fragment {
     private void initList(View v) {
         pm = PreferencesManager.getInstance(getActivity());
 
-        comicsData = new ArrayList<>();
+        comicsModel = new ArrayList<>();
 
-        adapter = new ComicsListAdapter(getActivity(), R.layout.fragment_list_item, new ArrayList<ComicsData>());
-
+        adapter = new FavoritesListAdapter(getActivity(), new ArrayList<ComicsModel>());
 
         comics_list.setAdapter(adapter);
-        comics_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = null;
-                if (pm.getCode(position).equals("c")) {
-                    intent = new Intent(getActivity(), ComicsViewer.class);
-                    intent.putExtra("comicsUrl", comicsData.get(position).getComicsUrl());
-                    intent.putExtra("episodeUrl", comicsData.get(position).getEpisodeUrl());
-                } else {
-                    intent = new Intent(getActivity(), ComicsEpisodeActivity.class);
-                    intent.putExtra("url", comicsData.get(position).getEpisodeUrl());
-                }
-                intent.putExtra("image", comicsData.get(position).getImage());
-                intent.putExtra("title", comicsData.get(position).getTitle());
-                startActivity(intent);
-            }
-        });
-
-        comicsData = pm.getFavorites();
-        adapter.setComicsData(comicsData);
+        comics_list.setLayoutManager(new LinearLayoutManager(getActivity()));
+        comics_list.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+        comicsModel = pm.getFavorites();
+        adapter.setComicsModel(comicsModel);
     }
 
     public void refresh(){
         if(!isFirst) {
-            comicsData = pm.getFavorites();
-            adapter.setComicsData(comicsData);
-            adapter.notifyDataSetChanged();
+            comicsModel = pm.getFavorites();
+            adapter.setComicsModel(comicsModel);
         }
     }
 

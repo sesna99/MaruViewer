@@ -2,14 +2,14 @@ package ind.simsim.maruViewer.UI.Fragment;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
@@ -22,9 +22,8 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ind.simsim.maruViewer.Model.ComicsModel;
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Model.ComicsData;
-import ind.simsim.maruViewer.UI.Activity.ComicsEpisodeActivity;
 import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
 
 /**
@@ -32,13 +31,13 @@ import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
  */
 public class ComicsListFragment extends Fragment {
     @BindView(R.id.comics_list)
-    ListView comics_list;
+    RecyclerView comics_list;
 
     @BindView(R.id.load_list)
     SwipyRefreshLayout load_list;
 
     private String url;
-    private ArrayList<ComicsData> comicsData;
+    private ArrayList<ComicsModel> comicsModel;
     private ComicsListAdapter adapter;
     private int order = 1;
     private Bundle bundle;
@@ -73,36 +72,27 @@ public class ComicsListFragment extends Fragment {
         order = 1;
     }
 
-    private void initList(View v){
-        adapter = new ComicsListAdapter(getActivity(), R.layout.fragment_list_item, new ArrayList<ComicsData>());
+    private void initList(View v) {
+        adapter = new ComicsListAdapter(getActivity(), new ArrayList<ComicsModel>());
 
         load_list.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh(SwipyRefreshLayoutDirection swipyRefreshLayoutDirection) {
-                if(swipyRefreshLayoutDirection == SwipyRefreshLayoutDirection.TOP) {
+                if (swipyRefreshLayoutDirection == SwipyRefreshLayoutDirection.TOP) {
                     order = 1;
-                    comicsData = new ArrayList<>();
+                    comicsModel = new ArrayList<>();
                 }
                 new ComicsList().execute();
             }
         });
 
+        comics_list.setLayoutManager(new LinearLayoutManager(getActivity()));
+        comics_list.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
         comics_list.setAdapter(adapter);
-        comics_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getActivity(), ComicsEpisodeActivity.class);
-                intent.putExtra("url", comicsData.get(position).getLink());
-                intent.putExtra("title", comicsData.get(position).getTitle());
-                startActivity(intent);
-            }
-        });
-
-
     }
 
-    public void initListData(){
-        comicsData = new ArrayList<>();
+    public void initListData() {
+        comicsModel = new ArrayList<>();
         isFirst = true;
         new ComicsList().execute();
     }
@@ -113,7 +103,7 @@ public class ComicsListFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            if(isFirst) {
+            if (isFirst) {
                 dialog = new ProgressDialog(getActivity());
                 dialog.setTitle("Load");
                 dialog.setMessage("리스트 생성중..");
@@ -133,18 +123,18 @@ public class ComicsListFragment extends Fragment {
                 String temp;
 
                 int size = image.size();
-                ComicsData data;
-                for(int i = 0; i < size; i++){
+                ComicsModel data;
+                for (int i = 0; i < size; i++) {
                     temp = image.get(i).attr("style");
-                    data = new ComicsData();
-                    if(temp.contains("http://marumaru.in"))
-                        data.setImage(temp.substring(21, temp.length()-1));
+                    data = new ComicsModel();
+                    if (temp.contains("http://marumaru.in"))
+                        data.setImage(temp.substring(21, temp.length() - 1));
                     else
-                        data.setImage("http://marumaru.in" + temp.substring(21, temp.length()-1));
+                        data.setImage("http://marumaru.in" + temp.substring(21, temp.length() - 1));
                     temp = link.get(i).attr("onclick");
-                    data.setLink(temp.substring(8, temp.length()-3));
+                    data.setLink(temp.substring(8, temp.length() - 3));
                     data.setTitle(title.get(i).text());
-                    comicsData.add(data);
+                    comicsModel.add(data);
                 }
 
                 document = null;
@@ -152,7 +142,7 @@ public class ComicsListFragment extends Fragment {
                 link = null;
                 title = null;
                 temp = null;
-            }catch(Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -161,12 +151,11 @@ public class ComicsListFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Void mVoid) {
-            if(isFirst) {
+            if (isFirst) {
                 dialog.dismiss();
                 isFirst = false;
             }
-            adapter.setComicsData(comicsData);
-            adapter.refresh();
+            adapter.setComicsModel(comicsModel);
             load_list.setRefreshing(false);
         }
     }

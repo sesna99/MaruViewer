@@ -3,6 +3,9 @@ package ind.simsim.maruViewer.UI.Fragment;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,10 +24,10 @@ import butterknife.ButterKnife;
 import ind.simsim.maruViewer.Event.DownLoadCompleteEvent;
 import ind.simsim.maruViewer.Event.DownLoadRemoveEvent;
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Model.ComicsData;
+import ind.simsim.maruViewer.Model.ComicsModel;
 import ind.simsim.maruViewer.Service.PreferencesManager;
 import ind.simsim.maruViewer.UI.Activity.ComicsViewer;
-import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
+import ind.simsim.maruViewer.UI.Adapter.ComicsSaveListAdapter;
 
 /**
  * Created by jack on 2016. 12. 15..
@@ -32,11 +35,11 @@ import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
 
 public class ComicsSaveListFragment extends Fragment {
     @BindView(R.id.comics_list)
-    ListView comics_list;
+    RecyclerView comics_list;
 
-    private ComicsListAdapter adapter;
+    private ComicsSaveListAdapter adapter;
     private ArrayList<ArrayList<String>> comicsData;
-    private ArrayList<ComicsData> folderList;
+    private ArrayList<ComicsModel> folderList;
     private boolean isFirst = true;
 
     public ComicsSaveListFragment() {
@@ -69,35 +72,23 @@ public class ComicsSaveListFragment extends Fragment {
     }
 
     private void initList(View v){
-        adapter = new ComicsListAdapter(getActivity(), R.layout.fragment_list_item, new ArrayList<ComicsData>());
-        comics_list.setAdapter(adapter);
-        comics_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getActivity(), ComicsViewer.class);
-                intent.putExtra("image", comicsData.get(position));
-                intent.putExtra("title", folderList.get(position).getTitle());
-                intent.putExtra("comicsUrl", "");
-                intent.putExtra("episodeUrl", "");
-                startActivity(intent);
-                Log.i("path", comicsData.get(position).get(0));
-            }
-        });
-
         folderList = getFolderList();
         setComicsData(folderList);
-        adapter.setComicsData(setComicsThum(folderList));
+        adapter = new ComicsSaveListAdapter(getActivity(), setComicsThum(folderList), folderList, comicsData);
+        comics_list.setLayoutManager(new LinearLayoutManager(getActivity()));
+        comics_list.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+        comics_list.setAdapter(adapter);
     }
 
-    private ArrayList<ComicsData> getFolderList() {
+    private ArrayList<ComicsModel> getFolderList() {
         try {
-            ArrayList<ComicsData> folderList = new ArrayList<>();
+            ArrayList<ComicsModel> folderList = new ArrayList<>();
             String path = PreferencesManager.getInstance(getActivity()).getDownLoadDirectory();
             File file = new File(path);
             if(file.exists()) {
                 File[] files = file.listFiles();
                 for (int i = 0; i < files.length; i++) {
-                    folderList.add(0, new ComicsData(files[i].getName(), files[i].getAbsolutePath()));
+                    folderList.add(0, new ComicsModel(files[i].getName(), files[i].getAbsolutePath()));
                 }
             }
             return folderList;
@@ -107,7 +98,7 @@ public class ComicsSaveListFragment extends Fragment {
         }
     }
 
-    private ArrayList<ComicsData> setComicsThum(ArrayList<ComicsData> folderList){
+    private ArrayList<ComicsModel> setComicsThum(ArrayList<ComicsModel> folderList){
         try {
             String path;
             File file;
@@ -125,7 +116,7 @@ public class ComicsSaveListFragment extends Fragment {
         }
     }
 
-    private void setComicsData(ArrayList<ComicsData> folderList){
+    private void setComicsData(ArrayList<ComicsModel> folderList){
         comicsData = new ArrayList<>();
         try {
             String path;
@@ -151,8 +142,7 @@ public class ComicsSaveListFragment extends Fragment {
             folderList = getFolderList();
             setComicsData(folderList);
             setComicsThum(folderList);
-            adapter.setComicsData(folderList);
-            adapter.notifyDataSetChanged();
+            adapter.setComicsModel(folderList);
         }
     }
 

@@ -15,6 +15,12 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -30,9 +36,11 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Model.ComicsData;
+import ind.simsim.maruViewer.Model.ComicsModel;
 import ind.simsim.maruViewer.Service.ComicsSave;
 import ind.simsim.maruViewer.Service.PreferencesManager;
+
+import static ind.simsim.maruViewer.R.id.adView;
 
 /**
  * Created by admin on 2016-02-19.
@@ -53,6 +61,9 @@ public class ComicsEpisodeActivity extends BaseActivity {
     @BindView(R.id.webView)
     WebView webView;
 
+    @BindView(R.id.adView)
+    AdView adView;
+
     private Episode task;
     private int dWidth, dHeight;
     private Intent intent;
@@ -66,6 +77,8 @@ public class ComicsEpisodeActivity extends BaseActivity {
     private PreferencesManager pm;
     private ArrayList<String> episode;
     private Map<String, String> comicsInfo;
+    private FirebaseAnalytics firebaseAnalytics;
+    private AdRequest adRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +86,43 @@ public class ComicsEpisodeActivity extends BaseActivity {
         setContentView(R.layout.activity_comics_episode);
 
         ButterKnife.bind(this);
+
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
+        adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+                Log.i("Ads", "onAdLoaded");
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                // Code to be executed when an ad request fails.
+                Log.i("Ads", "onAdFailedToLoad");
+            }
+
+            @Override
+            public void onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+                Log.i("Ads", "onAdOpened");
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+                // Code to be executed when the user has left the app.
+                Log.i("Ads", "onAdLeftApplication");
+            }
+
+            @Override
+            public void onAdClosed() {
+                // Code to be executed when when the user is about to return
+                // to the app after tapping on an ad.
+                Log.i("Ads", "onAdClosed");
+            }
+        });
 
         episodeUrl = getIntent().getStringExtra("url");
         episodeUrl = episodeUrl.contains("marumaru") ? episodeUrl : "http://marumaru.in" + episodeUrl;
@@ -108,7 +158,7 @@ public class ComicsEpisodeActivity extends BaseActivity {
                     favorite_button.setBackgroundResource(R.drawable.star3);
                 }
                 else {
-                    pm.setFavorites(new ComicsData(title_view.getText().toString(), imageUrl, "", episodeUrl), "e");
+                    pm.setFavorites(new ComicsModel(title_view.getText().toString(), imageUrl, "", episodeUrl), "e");
                     favorite_button.setBackgroundResource(R.drawable.star1);
                 }
             }
@@ -173,7 +223,7 @@ public class ComicsEpisodeActivity extends BaseActivity {
                 Elements content = document.select("div[class=content] a");
                 Elements episodeTitle = document.select("div[class=subject] h1");
                 html = new StringBuilder();
-                html.append("<html><body><div style=\"text-align: center\"><img src=\"").append(image.attr("src")).append("\" width=").append(dWidth / 3.5).append(" height=").append(dHeight / 2.5).append("></div><br>");
+                html.append("<html><head><meta charset=\"utf-8\"/></head><body><div style=\"text-align: center\"><img src=\"").append(image.attr("src")).append("\" width=").append(dWidth / 3.5).append(" height=").append(dHeight / 2.5).append("></div><br>");
                 html.append("<div align=\"center\" style=\"color: rgb(0, 0, 0); font-family: dotum; font-size: 12px; line-height: 19.2px; text-align: center;\"><br>");
                 imageUrl = image.attr("src");
                 episode = new ArrayList<>();
@@ -190,7 +240,7 @@ public class ComicsEpisodeActivity extends BaseActivity {
                     }
                 }
 
-                html.append("</div></body></html>");
+                html.append("</div><br><br><br></body></html>");
 
                 if(title.equals(""))
                     title = episodeTitle.text();

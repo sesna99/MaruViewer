@@ -5,9 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -20,7 +17,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
@@ -34,15 +34,13 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ind.simsim.maruViewer.Event.DownLoadRemoveEvent;
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Model.ComicsData;
+import ind.simsim.maruViewer.Model.ComicsModel;
 import ind.simsim.maruViewer.Service.ComicsSave;
 import ind.simsim.maruViewer.Service.PreferencesManager;
 
@@ -68,6 +66,9 @@ public class ComicsViewer extends BaseActivity {
     @BindView(R.id.webView)
     WebView webView;
 
+    @BindView(R.id.adView)
+    AdView adView;
+
     private String comicsUrl, episodeUrl, imageUrl, title, path;
     private Intent intent;
     private File file;
@@ -76,12 +77,14 @@ public class ComicsViewer extends BaseActivity {
     private WebSettings settings;
     private Context context;
     private int dWidth, dHeight;
-    private ArrayList<ComicsData> comicsDatas;
+    private ArrayList<ComicsModel> comicsModels;
     private ArrayList<String> image;
     private SwipyRefreshLayout nextComics;
     private boolean isFirst = true;
     private PreferencesManager pm;
     private int scroll;
+    private FirebaseAnalytics firebaseAnalytics;
+    private AdRequest adRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +92,11 @@ public class ComicsViewer extends BaseActivity {
         setContentView(R.layout.activity_comics);
 
         ButterKnife.bind(this);
+
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        adRequest = new AdRequest.Builder()
+                .build();
+        adView.loadAd(adRequest);
 
         context = this;
         intent = getIntent();
@@ -110,7 +118,7 @@ public class ComicsViewer extends BaseActivity {
                 favorite_button.setBackgroundResource(R.drawable.star1);
 
 
-        comicsDatas = new ArrayList<>();
+        comicsModels = new ArrayList<>();
 
         nextComics = (SwipyRefreshLayout) findViewById(R.id.nextComics);
         nextComics.setDirection(SwipyRefreshLayoutDirection.BOTTOM);
@@ -118,7 +126,7 @@ public class ComicsViewer extends BaseActivity {
             @Override
             public void onRefresh(SwipyRefreshLayoutDirection swipyRefreshLayoutDirection) {
                 if (!episodeUrl.equals("")) {
-                    if (comicsDatas.size() > 0)
+                    if (comicsModels.size() > 0)
                         loadNextComics();
                     else
                         new Episode().execute();
@@ -189,7 +197,7 @@ public class ComicsViewer extends BaseActivity {
                         pm.deleteFavorites(pm.getFavoritesPosition("c", comicsUrl));
                         favorite_button.setBackgroundResource(R.drawable.star3);
                     } else {
-                        pm.setFavorites(new ComicsData(title_view.getText().toString(), imageUrl, comicsUrl, episodeUrl), "c");
+                        pm.setFavorites(new ComicsModel(title_view.getText().toString(), imageUrl, comicsUrl, episodeUrl), "c");
                         favorite_button.setBackgroundResource(R.drawable.star1);
                     }
                 }
@@ -253,6 +261,7 @@ public class ComicsViewer extends BaseActivity {
                     Log.i("image", imageUrl);
                     //getImageSize(imageUrl);
                 }
+                html.append("<br><br><br><br><br><br><br><br><br><br>");
                 html.append(getResources().getString(R.string.htmlEnd));
 
                 document = null;
@@ -302,7 +311,7 @@ public class ComicsViewer extends BaseActivity {
                     if (!content.get(i).attr("href").equals("")) {
                         if (!content.get(i).attr("href").contains("http"))
                             break;
-                        comicsDatas.add(new ComicsData(content.get(i).text(), content.get(i).attr("href")));
+                        comicsModels.add(new ComicsModel(content.get(i).text(), content.get(i).attr("href")));
                     }
                 }
 
@@ -352,16 +361,16 @@ public class ComicsViewer extends BaseActivity {
         nextComics.setRefreshing(false);
         if (!comicsUrl.equals(""))
             if (!pm.searchLately(comicsUrl))
-                pm.setLately(new ComicsData(title_view.getText().toString(), imageUrl, comicsUrl, episodeUrl), webView.getScrollY());
+                pm.setLately(new ComicsModel(title_view.getText().toString(), imageUrl, comicsUrl, episodeUrl), webView.getScrollY());
     }
 
     public void loadNextComics() {
-        for (int i = 0; i < comicsDatas.size(); i++) {
-            if (title_view.getText().toString().equals(comicsDatas.get(i).getTitle())) {
-                if (i + 1 < comicsDatas.size()) {
-                    if (!comicsDatas.get(i + 1).getTitle().contains("전편")) {
-                        comicsUrl = comicsDatas.get(i + 1).getLink();
-                        title = comicsDatas.get(i + 1).getTitle();
+        for (int i = 0; i < comicsModels.size(); i++) {
+            if (title_view.getText().toString().equals(comicsModels.get(i).getTitle())) {
+                if (i + 1 < comicsModels.size()) {
+                    if (!comicsModels.get(i + 1).getTitle().contains("전편")) {
+                        comicsUrl = comicsModels.get(i + 1).getLink();
+                        title = comicsModels.get(i + 1).getTitle();
                         title_view.setText(title);
                         new Comics().execute();
                         break;

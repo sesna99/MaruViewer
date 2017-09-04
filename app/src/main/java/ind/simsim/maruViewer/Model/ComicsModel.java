@@ -4,7 +4,7 @@ package ind.simsim.maruViewer.Model;
  * Created by jack on 2016. 12. 8..
  */
 
-public class ComicsData {
+public class ComicsModel {
     private String title;
     private String image;
     private String imageName;
@@ -12,21 +12,21 @@ public class ComicsData {
     private String comicsUrl;
     private String episodeUrl;
 
-    public ComicsData(){
+    public ComicsModel(){
     }
 
-    public ComicsData(String title, String link) {
+    public ComicsModel(String title, String link) {
         this.title = title;
         this.link = link;
     }
 
-    public ComicsData(String title, String image, String link) {
+    public ComicsModel(String title, String image, String link) {
         this.title = title;
         this.image = image;
         this.link = link;
     }
 
-    public ComicsData(String title, String image, String comicsUrl, String episodeUrl) {
+    public ComicsModel(String title, String image, String comicsUrl, String episodeUrl) {
         this.title = title;
         this.image = image;
         this.comicsUrl = comicsUrl;

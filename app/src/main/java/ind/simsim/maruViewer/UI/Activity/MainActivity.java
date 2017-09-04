@@ -19,6 +19,10 @@ import android.widget.Toast;
 import com.flyco.tablayout.CommonTabLayout;
 import com.flyco.tablayout.listener.CustomTabEntity;
 import com.flyco.tablayout.listener.OnTabSelectListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
@@ -31,7 +35,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ind.simsim.maruViewer.Event.UpdateEvent;
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Model.TabEntity;
+import ind.simsim.maruViewer.Model.TabModel;
 import ind.simsim.maruViewer.Service.UpdateCheck;
 import ind.simsim.maruViewer.UI.Adapter.PageAdapter;
 
@@ -68,6 +72,8 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(this);
+
+        MobileAds.initialize(this, getResources().getString(R.string.app_id));
 
         EventBus.getDefault().register(this);
 
@@ -114,7 +120,7 @@ public class MainActivity extends BaseActivity {
 
         tabEntities = new ArrayList<>();
         for (int i = 0; i < selectImg.length; i++)
-            tabEntities.add(new TabEntity(title[i], selectImg[i], unselectImg[i]));
+            tabEntities.add(new TabModel(title[i], selectImg[i], unselectImg[i]));
 
         tabLayout = (CommonTabLayout) findViewById(R.id.tabs);
         tabLayout.setTabData(tabEntities);

@@ -16,7 +16,6 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.NativeExpressAdView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,21 +26,24 @@ import ind.simsim.maruViewer.Model.ComicsModel;
 import ind.simsim.maruViewer.R;
 import ind.simsim.maruViewer.Service.PreferencesManager;
 import ind.simsim.maruViewer.UI.Activity.ComicsEpisodeActivity;
+import ind.simsim.maruViewer.UI.Activity.ComicsViewer;
 
 /**
  * Created by trycatch on 2017. 9. 4..
  */
 
-public class ComicsListAdapter extends RecyclerView.Adapter {
+public class ComicsLatelyListAdapter extends RecyclerView.Adapter {
     private Context mContext;
     private ArrayList<ComicsModel> comicsModel;
     private LayoutInflater inflater;
-    private int AD_POSITION = 7;
+    private PreferencesManager pm;
+    private int AD_POSITION = 4;
 
-    public ComicsListAdapter(Context mContext, ArrayList<ComicsModel> comicsModel) {
+    public ComicsLatelyListAdapter(Context mContext, ArrayList<ComicsModel> comicsModel) {
         this.mContext = mContext;
         this.comicsModel = comicsModel;
         inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        pm = PreferencesManager.getInstance(mContext);
     }
 
     @Override
@@ -76,8 +78,11 @@ public class ComicsListAdapter extends RecyclerView.Adapter {
             contentViewHolder.item_view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(mContext, ComicsEpisodeActivity.class);
-                    intent.putExtra("url", comicsModel.get(position).getLink());
+                    Intent intent = null;
+                    intent = new Intent(mContext, ComicsViewer.class);
+                    intent.putExtra("comicsUrl", comicsModel.get(position).getComicsUrl());
+                    intent.putExtra("episodeUrl", comicsModel.get(position).getEpisodeUrl());
+                    intent.putExtra("scroll", pm.getScroll(pm.getLatelyPosition(comicsModel.get(position).getComicsUrl())));
                     intent.putExtra("title", comicsModel.get(position).getTitle());
                     mContext.startActivity(intent);
                 }
@@ -104,7 +109,6 @@ public class ComicsListAdapter extends RecyclerView.Adapter {
 
     public void setComicsModel(ArrayList<ComicsModel> comicsModel){
         this.comicsModel = comicsModel;
-
         notifyDataSetChanged();
     }
 

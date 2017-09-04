@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Model.ComicsData;
+import ind.simsim.maruViewer.Model.ComicsModel;
 
 /**
  * Created by jack on 2016. 12. 8..
@@ -22,28 +22,28 @@ import ind.simsim.maruViewer.Model.ComicsData;
 public class SaveDialogListAdapter extends BaseAdapter {
     private Context mContext;
     private LayoutInflater inflater;
-    private ArrayList<ComicsData> comicsDatas;
+    private ArrayList<ComicsModel> comicsModels;
     private boolean[] checked;
     private ViewHolder viewHolder;
 
-    public SaveDialogListAdapter(Context context, ArrayList<ComicsData> comicsDatas) {
+    public SaveDialogListAdapter(Context context, ArrayList<ComicsModel> comicsModels) {
         mContext = context;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        this.comicsDatas = comicsDatas;
-        comicsDatas.add(0, new ComicsData("전체 선택", "", ""));
-        checked = new boolean[comicsDatas.size()];
+        this.comicsModels = comicsModels;
+        comicsModels.add(0, new ComicsModel("전체 선택", "", ""));
+        checked = new boolean[comicsModels.size()];
         for(int i = 0; i < checked.length; i++)
             checked[i] = false;
     }
 
     @Override
     public int getCount() {
-        return comicsDatas.size();
+        return comicsModels.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return comicsDatas.get(i);
+        return comicsModels.get(i);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class SaveDialogListAdapter extends BaseAdapter {
             viewHolder = (ViewHolder)view.getTag();
         }
 
-        viewHolder.episode.setText(comicsDatas.get(i).getTitle());
+        viewHolder.episode.setText(comicsModels.get(i).getTitle());
         viewHolder.checkBox.setChecked(checked[i]);
 
         return view;
@@ -72,11 +72,11 @@ public class SaveDialogListAdapter extends BaseAdapter {
         return checked[position];
     }
 
-    public ArrayList<ComicsData> getCheckedData(){
-        ArrayList<ComicsData> data = new ArrayList<>();
+    public ArrayList<ComicsModel> getCheckedData(){
+        ArrayList<ComicsModel> data = new ArrayList<>();
         for(int i = 1; i < getCount(); i++)
             if(getChecked(i))
-                data.add(comicsDatas.get(i));
+                data.add(comicsModels.get(i));
 
         return data;
     }

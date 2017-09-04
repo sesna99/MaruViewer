@@ -12,7 +12,7 @@ import java.util.Collections;
 
 import ind.simsim.maruViewer.Event.FavoriteEvent;
 import ind.simsim.maruViewer.Event.LatelyEvent;
-import ind.simsim.maruViewer.Model.ComicsData;
+import ind.simsim.maruViewer.Model.ComicsModel;
 
 /**
  * Created by jack on 2016. 12. 15..
@@ -28,7 +28,7 @@ public class PreferencesManager {
         editor = sharedPreferences.edit();
     }
 
-    public void setFavorites(ComicsData data, String code){
+    public void setFavorites(ComicsModel data, String code){
         int position = getPosition("favorites");
         editor.putString("code" + position, code);
         editor.putString("favoritesTitle" + position, data.getTitle());
@@ -41,7 +41,7 @@ public class PreferencesManager {
     }
 
     public void deleteFavorites(int position){
-        ArrayList<ComicsData> data = getFavorites();
+        ArrayList<ComicsModel> data = getFavorites();
         for(int i = position; i < data.size() - 1; i++){
             editor.putString("code" + i, getCode(i + 1));
             editor.putString("favoritesTitle" + i, data.get(i + 1).getTitle());
@@ -62,23 +62,23 @@ public class PreferencesManager {
         EventBus.getDefault().post(new FavoriteEvent(true));
     }
 
-    public ArrayList<ComicsData> getFavorites(){
+    public ArrayList<ComicsModel> getFavorites(){
         int position = getPosition("favorites");
-        ArrayList<ComicsData> comicsDatas = new ArrayList<>();
-        ComicsData data;
+        ArrayList<ComicsModel> comicsModels = new ArrayList<>();
+        ComicsModel data;
         for(int i = 0; i < position; i++){
-            data = new ComicsData();
+            data = new ComicsModel();
             data.setTitle(sharedPreferences.getString("favoritesTitle" + i, ""));
             data.setComicsUrl(sharedPreferences.getString("favoritesComicsUrl" + i, ""));
             data.setEpisodeUrl(sharedPreferences.getString("favoritesEpisodeUrl" + i, ""));
             data.setImage(sharedPreferences.getString("favoritesImage" + i, ""));
-            comicsDatas.add(data);
+            comicsModels.add(data);
         }
-        return comicsDatas;
+        return comicsModels;
     }
 
     public boolean searchFavorites(String code, String url){
-        ArrayList<ComicsData> data = getFavorites();
+        ArrayList<ComicsModel> data = getFavorites();
         for(int i = 0; i < data.size(); i++){
             if(data.get(i).getComicsUrl().equals(url))
                 return true;
@@ -89,7 +89,7 @@ public class PreferencesManager {
     }
 
     public int getFavoritesPosition(String code, String url){
-        ArrayList<ComicsData> data = getFavorites();
+        ArrayList<ComicsModel> data = getFavorites();
         for(int i = 0; i < data.size(); i++){
             if(data.get(i).getComicsUrl().equals(url))
                 return i;
@@ -99,7 +99,7 @@ public class PreferencesManager {
         return -1;
     }
 
-    public void setLately(ComicsData data, int scroll){
+    public void setLately(ComicsModel data, int scroll){
         int position = getPosition("lately");
         editor.putString("latelyTitle" + position, data.getTitle());
         editor.putString("latelyComicsUrl" + position, data.getComicsUrl());
@@ -118,7 +118,7 @@ public class PreferencesManager {
     }
 
     public void deleteLately(int position){
-        ArrayList<ComicsData> data = getLately();
+        ArrayList<ComicsModel> data = getLately();
         for(int i = position; i < data.size() - 1; i++){
             editor.putString("latelyTitle" + i, data.get(i + 1).getTitle());
             editor.putString("latelyComicsUrl" + i, data.get(i + 1).getComicsUrl());
@@ -139,26 +139,26 @@ public class PreferencesManager {
         EventBus.getDefault().post(new LatelyEvent(true));
     }
 
-    public ArrayList<ComicsData> getLately(){
+    public ArrayList<ComicsModel> getLately(){
         int position = getPosition("lately");
-        ArrayList<ComicsData> comicsDatas = new ArrayList<>();
-        ComicsData data;
+        ArrayList<ComicsModel> comicsModels = new ArrayList<>();
+        ComicsModel data;
         for(int i = 0; i < position; i++){
-            data = new ComicsData();
+            data = new ComicsModel();
             data.setTitle(sharedPreferences.getString("latelyTitle" + i, ""));
             data.setComicsUrl(sharedPreferences.getString("latelyComicsUrl" + i, ""));
             data.setEpisodeUrl(sharedPreferences.getString("latelyEpisodeUrl" + i, ""));
             data.setImage(sharedPreferences.getString("latelyImage" + i, ""));
-            comicsDatas.add(data);
+            comicsModels.add(data);
         }
-        for(int i = 0; i < comicsDatas.size() / 2; i++){
-            Collections.swap(comicsDatas, i, comicsDatas.size() - i - 1);
+        for(int i = 0; i < comicsModels.size() / 2; i++){
+            Collections.swap(comicsModels, i, comicsModels.size() - i - 1);
         }
-        return comicsDatas;
+        return comicsModels;
     }
 
     public boolean searchLately(String url){
-        ArrayList<ComicsData> data = getLately();
+        ArrayList<ComicsModel> data = getLately();
         for(int i = 0; i < data.size(); i++){
             if(data.get(i).getComicsUrl().equals(url))
                 return true;
@@ -167,7 +167,7 @@ public class PreferencesManager {
     }
 
     public int getLatelyPosition(String url){
-        ArrayList<ComicsData> data = getLately();
+        ArrayList<ComicsModel> data = getLately();
         for(int i = 0; i < data.size(); i++){
             if(data.get(i).getComicsUrl().equals(url))
                 return i;

@@ -115,11 +115,9 @@ public class UpdateCheck {
                         .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                //download(downLink);
-                                Intent intent = new Intent(context, DownloadService.class);
-                                intent.putExtra("code", 2);
-                                intent.putExtra("url", downLink);
-                                context.startService(intent);
+                                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(downLink));
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                context.startActivity(intent);
                                 activity.finish();
                             }
                         })

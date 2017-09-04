@@ -5,13 +5,14 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ind.simsim.maruViewer.R;
-import ind.simsim.maruViewer.Model.ComicsData;
+import ind.simsim.maruViewer.Model.ComicsModel;
 import ind.simsim.maruViewer.UI.Activity.ComicsEpisodeActivity;
 import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
 
@@ -31,10 +32,10 @@ import ind.simsim.maruViewer.UI.Adapter.ComicsListAdapter;
  */
 public class SearchFragment extends Fragment {
     @BindView(R.id.comics_list)
-    ListView comics_list;
+    RecyclerView comics_list;
 
     private String url;
-    private ArrayList<ComicsData> comicsDatas;
+    private ArrayList<ComicsModel> comicsModels;
     private ComicsListAdapter adapter;
     private Bundle bundle;
     private boolean isFirst = true;
@@ -66,19 +67,12 @@ public class SearchFragment extends Fragment {
     }
 
     private void initList(View v){
-        comicsDatas = new ArrayList<>();
+        comicsModels = new ArrayList<>();
 
-        adapter = new ComicsListAdapter(getActivity(), R.layout.fragment_list_item, comicsDatas);
+        adapter = new ComicsListAdapter(getActivity(), comicsModels);
+        comics_list.setLayoutManager(new LinearLayoutManager(getActivity()));
+        comics_list.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
         comics_list.setAdapter(adapter);
-        comics_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getActivity(), ComicsEpisodeActivity.class);
-                intent.putExtra("url", comicsDatas.get(position).getLink());
-                intent.putExtra("title", comicsDatas.get(position).getTitle());
-                startActivity(intent);
-            }
-        });
 
         new ComicsList().execute();
     }
@@ -108,13 +102,13 @@ public class SearchFragment extends Fragment {
 
                 int size = image.size();
 
-                ComicsData data;
+                ComicsModel data;
                 for(int i = 0; i < size; i++){
-                    data = new ComicsData();
+                    data = new ComicsModel();
                     data.setImage(image.get(i).attr("src"));
                     data.setLink(link.get(i).attr("href"));
                     data.setTitle(title.get(i).text());
-                    comicsDatas.add(data);
+                    comicsModels.add(data);
                 }
 
                 document = null;
@@ -131,8 +125,7 @@ public class SearchFragment extends Fragment {
         @Override
         protected void onPostExecute(Void mVoid) {
             dialog.dismiss();
-            adapter.setComicsData(comicsDatas);
-            adapter.refresh();
+            adapter.setComicsModel(comicsModels);
         }
     }
 }
