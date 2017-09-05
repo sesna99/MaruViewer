@@ -261,7 +261,8 @@ public class ComicsViewer extends BaseActivity {
                     Log.i("image", imageUrl);
                     //getImageSize(imageUrl);
                 }
-                html.append("<br><br><br><br><br><br><br><br><br><br>");
+                for(int i = 0; i < 11; i++)
+                    html.append("<br>");
                 html.append(getResources().getString(R.string.htmlEnd));
 
                 document = null;
@@ -337,6 +338,8 @@ public class ComicsViewer extends BaseActivity {
         int size = image.size();
         for (int i = 0; i < size; i++)
             html.append("<img src=").append("\"file://" + image.get(i)).append("\" width=").append(dWidth).append(" height=").append(dHeight).append("/> ");
+        for(int i = 0; i < 11; i++)
+            html.append("<br>");
         html.append(getResources().getString(R.string.htmlEnd));
 
         path = getCacheDir() + "/maru.html";

@@ -26,6 +26,7 @@ import com.gun0912.tedpermission.TedPermission;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -95,7 +96,11 @@ public class MainActivity extends BaseActivity {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 Intent intent = new Intent(MainActivity.this, ComicsListActivity.class);
                                 intent.putExtra("position", -1);
-                                intent.putExtra("url", getString(R.string.search, ((EditText)v.findViewById(R.id.edit_text)).getText().toString()));
+                                try {
+                                    intent.putExtra("url", getString(R.string.search, URLEncoder.encode(((EditText)v.findViewById(R.id.edit_text)).getText().toString(), "utf-8")));
+                                }catch (Exception e){
+
+                                }
                                 intent.putExtra("category", "검색");
                                 startActivity(intent);
                             }
