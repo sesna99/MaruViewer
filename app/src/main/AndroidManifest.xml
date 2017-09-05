@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ind.simsim.maruViewer">
+    package="ind.trycatch.maruViewer">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -13,7 +13,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".UI.Activity.MainActivity"
+        <activity android:name="ind.trycatch.maruViewer.UI.Activity.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,11 +25,11 @@
                 android:name="android.app.default_searchable"
                 android:value=".SearchResultsActivity" />
         </activity>
-        <activity android:name=".UI.Activity.ComicsListActivity"
+        <activity android:name="ind.trycatch.maruViewer.UI.Activity.ComicsListActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".UI.Activity.ComicsViewer"
+        <activity android:name="ind.trycatch.maruViewer.UI.Activity.ComicsViewer"
             android:screenOrientation="portrait"/>
-        <activity android:name=".UI.Activity.ComicsEpisodeActivity"
+        <activity android:name="ind.trycatch.maruViewer.UI.Activity.ComicsEpisodeActivity"
             android:screenOrientation="portrait"/>
 
         <provider
