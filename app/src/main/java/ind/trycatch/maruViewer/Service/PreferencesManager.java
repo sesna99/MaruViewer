@@ -209,6 +209,15 @@ public class PreferencesManager {
         return sharedPreferences.getString("directory", Environment.getExternalStorageDirectory().toString() + "/마루뷰어/");
     }
 
+    public void setAlert(boolean bool){
+        editor.putBoolean("alert", bool);
+        editor.commit();
+    }
+
+    public boolean getAlert(){
+        return sharedPreferences.getBoolean("alert", true);
+    }
+
     public static PreferencesManager getInstance(Context context){
         if(instance == null){
             instance = new PreferencesManager(context);

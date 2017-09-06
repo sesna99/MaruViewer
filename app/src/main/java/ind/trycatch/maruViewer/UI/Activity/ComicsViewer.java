@@ -65,9 +65,6 @@ public class ComicsViewer extends BaseActivity {
     @BindView(R.id.webView)
     WebView webView;
 
-    @BindView(R.id.adView)
-    AdView adView;
-
     private String comicsUrl, episodeUrl, imageUrl, title, path;
     private Intent intent;
     private File file;
@@ -83,7 +80,6 @@ public class ComicsViewer extends BaseActivity {
     private PreferencesManager pm;
     private int scroll;
     private FirebaseAnalytics firebaseAnalytics;
-    private AdRequest adRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,10 +89,6 @@ public class ComicsViewer extends BaseActivity {
         ButterKnife.bind(this);
 
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
-        adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .build();
-        adView.loadAd(adRequest);
 
         context = this;
         intent = getIntent();
@@ -261,8 +253,6 @@ public class ComicsViewer extends BaseActivity {
                     Log.i("image", imageUrl);
                     //getImageSize(imageUrl);
                 }
-                for(int i = 0; i < 11; i++)
-                    html.append("<br>");
                 html.append(getResources().getString(R.string.htmlEnd));
 
                 document = null;
@@ -338,8 +328,6 @@ public class ComicsViewer extends BaseActivity {
         int size = image.size();
         for (int i = 0; i < size; i++)
             html.append("<img src=").append("\"file://" + image.get(i)).append("\" width=").append(dWidth).append(" height=").append(dHeight).append("/> ");
-        for(int i = 0; i < 11; i++)
-            html.append("<br>");
         html.append(getResources().getString(R.string.htmlEnd));
 
         path = getCacheDir() + "/maru.html";

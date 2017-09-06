@@ -34,6 +34,7 @@ import butterknife.ButterKnife;
 import ind.trycatch.maruViewer.Event.UpdateEvent;
 import ind.trycatch.maruViewer.R;
 import ind.trycatch.maruViewer.Model.TabModel;
+import ind.trycatch.maruViewer.Service.PreferencesManager;
 import ind.trycatch.maruViewer.Service.UpdateCheck;
 import ind.trycatch.maruViewer.UI.Adapter.PageAdapter;
 
@@ -80,6 +81,14 @@ public class MainActivity extends BaseActivity {
 
     private void init() {
         setNavigation();
+
+        if(PreferencesManager.getInstance(getApplicationContext()).getAlert()) {
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("공지사항")
+                    .setMessage(getResources().getString(R.string.alert))
+                    .show();
+            PreferencesManager.getInstance(getApplicationContext()).setAlert(false);
+        }
 
         title_view.setText(title[0]);
 
