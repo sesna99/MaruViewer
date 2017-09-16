@@ -69,8 +69,34 @@
     </string-array>
     <string name="genre_url">http://marumaru.in/?m=bbs<![CDATA[&]]>bid=manga<![CDATA[&]]>where=tag<![CDATA[&]]>keyword=G%3A</string>
     <string name="search">http://marumaru.in/?r=home<![CDATA[&]]>mod=search<![CDATA[&]]>keyword=%1$s</string>
-    <string name="htmlStart" formatted="false">"<![CDATA[<html><head><style>img{margin-left:20px; margin-right:20px; margin-bottom:25px;}</style></head><body><center><p>]]>"</string>
-    <string name="htmlEnd"><![CDATA[</p></center></body></html>]]></string>
+    <string name="htmlStart" formatted="false">"<![CDATA[<html><head><style>img{min-width:160%; min-height:100% margin-left:20px; margin-right:20px; margin-bottom:25px;} .crop{display:block; overflow:hidden; width:80%; height:100%}</style></head><body><center>]]>"</string>
+    <string name="htmlEnd"><![CDATA[</center></body><script type="text/javascript">
+  var contentDiv = document.getElementsByTagName("center")[0];
+  var divs = document.getElementsByTagName("div");
+  var imgs = document.getElementsByTagName("img");
+  var count = 0;
+
+  for (var i = 0; i < imgs.length; i++) {
+    var img = imgs.item(i);
+    var div = divs.item(i);
+
+    img.position = i;
+    img.div = div;
+
+    img.onload = function() {
+    alert(this.width + ", " + this.height);
+      if(this.width > this.height){
+        this.div.setAttribute("class", "crop");
+        var newDiv = document.createElement("div");
+        newDiv.setAttribute("class", "crop");
+        newDiv.innerHTML = this.div.innerHTML;
+        newDiv.getElementsByTagName("img")[0].align = "right";
+        contentDiv.insertBefore(newDiv, this.div);
+      }
+    }
+  }
+
+</script></html>]]></string>
     <string name="app_id">ca-app-pub-1333902887702426</string>
     <string name="banner_ad_unit_id">ca-app-pub-1333902887702426/3643671439</string>
     <string name="banner_test_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>

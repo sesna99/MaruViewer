@@ -32,7 +32,7 @@ public class ComicsListAdapter extends RecyclerView.Adapter {
     private Context mContext;
     private ArrayList<ComicsModel> comicsModel;
     private LayoutInflater inflater;
-    private int AD_POSITION = 7;
+    private int AD_POSITION = 1;
 
     public ComicsListAdapter(Context mContext, ArrayList<ComicsModel> comicsModel) {
         this.mContext = mContext;
@@ -55,7 +55,7 @@ public class ComicsListAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemViewType(int position) {
-        return (position + 1) % AD_POSITION;
+        return (position + 1) / AD_POSITION;
     }
 
     @Override

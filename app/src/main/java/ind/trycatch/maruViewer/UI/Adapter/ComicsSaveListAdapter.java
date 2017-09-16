@@ -38,7 +38,7 @@ public class ComicsSaveListAdapter extends RecyclerView.Adapter {
     private ArrayList<ComicsModel> folderList;
     private ArrayList<ArrayList<String>> comicsData;
     private LayoutInflater inflater;
-    private int AD_POSITION = 4;
+    private int AD_POSITION = 1;
 
     public ComicsSaveListAdapter(Context mContext, ArrayList<ComicsModel> comicsModel, ArrayList<ComicsModel> folderList, ArrayList<ArrayList<String>> comicsData) {
         this.mContext = mContext;
@@ -63,7 +63,7 @@ public class ComicsSaveListAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemViewType(int position) {
-        return (position + 1) % AD_POSITION;
+        return (position + 1) / AD_POSITION;
     }
 
     @Override

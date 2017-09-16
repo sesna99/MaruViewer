@@ -9,6 +9,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ind.trycatch.maruViewer.R;
@@ -59,12 +62,16 @@ public class ComicsListActivity extends BaseActivity {
 
     private void initFragment(){
         if(position != -1) {
-            String url;
+            String url = null;
             if(position < 15) {
                 url = getResources().getStringArray(R.array.url)[position];
             }
             else{
-                url = getResources().getString(R.string.genre_url) + category + "&p=";
+                try {
+                    url = getResources().getString(R.string.genre_url) + URLEncoder.encode(category, "utf-8") + "&p=";
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
             }
             fragment = new ComicsListFragment();
             bundle = new Bundle();

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -24,6 +25,7 @@ import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -37,11 +39,14 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ind.trycatch.maruViewer.Event.DivEvent;
 import ind.trycatch.maruViewer.Event.DownLoadRemoveEvent;
+import ind.trycatch.maruViewer.Event.FavoriteEvent;
 import ind.trycatch.maruViewer.R;
 import ind.trycatch.maruViewer.Model.ComicsModel;
 import ind.trycatch.maruViewer.Service.ComicsSave;
 import ind.trycatch.maruViewer.Service.PreferencesManager;
+import ind.trycatch.maruViewer.UI.JavascriptInterface;
 
 /**
  * Created by admin on 2016-02-18.
@@ -77,6 +82,7 @@ public class ComicsViewer extends BaseActivity {
     private ArrayList<String> image;
     private SwipyRefreshLayout nextComics;
     private boolean isFirst = true;
+    private boolean isDiv;
     private PreferencesManager pm;
     private int scroll;
     private FirebaseAnalytics firebaseAnalytics;
@@ -90,12 +96,15 @@ public class ComicsViewer extends BaseActivity {
 
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
+        EventBus.getDefault().register(this);
+
         context = this;
         intent = getIntent();
         comicsUrl = intent.getStringExtra("comicsUrl");
         episodeUrl = intent.getStringExtra("episodeUrl");
         title = intent.getStringExtra("title");
         scroll = intent.getIntExtra("scroll", 0);
+        isDiv = intent.getBooleanExtra("div", false);
         Log.i("Scroll", scroll+"");
 
         pm = PreferencesManager.getInstance(getApplicationContext());
@@ -132,14 +141,7 @@ public class ComicsViewer extends BaseActivity {
         dWidth = dm.widthPixels;
         dHeight = dm.heightPixels - 200;
 
-        webView.setWebViewClient(new WebViewClient());
-
-        settings = webView.getSettings();
-        settings.setUseWideViewPort(true);
-        settings.setBuiltInZoomControls(true);
-        settings.setDisplayZoomControls(false);
-        settings.setSupportZoom(true);
-        settings.setLoadWithOverviewMode(true);
+        initWebview();
 
         if (comicsUrl.equals("")){
             createHtml();
@@ -235,7 +237,28 @@ public class ComicsViewer extends BaseActivity {
                 image = document.select("img");
 
                 html = new StringBuilder();
-                html.append(getResources().getString(R.string.htmlStart));
+                html.append("<!DOCTYPE html>\n" +
+                        "<html>\n" +
+                        "  <head>\n" +
+                        "    <meta charset=\"utf-8\">\n" +
+                        "    <style media=\"screen\">\n" +
+                        "      img{\n" +
+                        "        min-width: 100%;\n" +
+                        "        min-height: 100%;\n" +
+                        "      }\n" +
+                        "      .crop img{\n" +
+                        "        min-width: 200%;\n" +
+                        "        min-height: 100%;\n" +
+                        "      }\n" +
+                        "      .crop{\n" +
+                        "        overflow: hidden;\n" +
+                        "        height: 100%;\n" +
+                        "        width: 100%;\n" +
+                        "      }\n" +
+                        "    </style>\n" +
+                        "  </head>\n" +
+                        "  <body>\n" +
+                        "    <center>\n");
 
                 imageUrl = image.get(0).attr("data-src");
 
@@ -249,11 +272,54 @@ public class ComicsViewer extends BaseActivity {
                     width = dWidth;
                     height = dHeight;
                     String imageUrl = "http://wasabisyrup.com" + image.get(i).attr("data-src").replaceAll(" ", "%20");
-                    html.append("<img src=").append(imageUrl).append(" width=").append(width).append(" height=").append(height).append("/> ");
-                    Log.i("image", imageUrl);
-                    //getImageSize(imageUrl);
+                    html.append("<div>").append("<img src=\"").append(imageUrl).append("\"/></div>");
                 }
-                html.append(getResources().getString(R.string.htmlEnd));
+
+                html.append(
+                        "    </center>\n" +
+                        "  </body>\n" +
+                        "\n" +
+                        "<script type=\"text/javascript\">\n" +
+                        "  var contentDiv = document.getElementsByTagName(\"center\")[0];\n" +
+                        "  var divs = document.getElementsByTagName(\"div\");\n" +
+                        "  var imgs = document.getElementsByTagName(\"img\");\n" +
+                        "  var count = 0;\n" +
+                        "  var isDiv = false;\n" +
+                        "  Android.checkImage();\n" +
+                        "\n" +
+                        "  for (var i = 0; i < imgs.length; i++) {\n" +
+                        "    var img = imgs.item(i);\n" +
+                        "    var div = divs.item(i);\n" +
+                        "\n" +
+                        "    img.position = i;\n" +
+                        "    img.lastPosition = imgs.length - 1;\n" +
+                        "    img.div = div;\n" +
+                        "\n" +
+                        "    img.onload = function() {\n" +
+                        "      if(this.naturalWidth > this.naturalHeight){\n" +
+                        "        Android.divImage();\n" +
+                        "        this.div.setAttribute(\"class\", \"crop\");\n" +
+                        "        var newDiv = document.createElement(\"div\");\n" +
+                        "        newDiv.setAttribute(\"class\", \"crop\");\n" +
+                        "        newDiv.innerHTML = this.div.innerHTML;\n" +
+                        "        newDiv.getElementsByTagName(\"img\")[0].align = \"right\";\n" +
+                        "        contentDiv.insertBefore(newDiv, this.div);\n" +
+                        "        isDiv = true;\n" +
+                        "      }\n" +
+                        "      count++\n" +
+                        "      if(count == this.lastPosition){\n" +
+                        "        Android.finishDivImage();\n" +
+                        "        if(isDiv){\n" +
+                        "           Android.divEvent();\n" +
+                        "        }\n" +
+                        "      }\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "\n" +
+                        "    Android.finishCheckImage();\n" +
+                        "</script>\n" +
+                        "\n" +
+                        "</html>\n");
 
                 document = null;
             } catch (Exception e) {
@@ -318,6 +384,29 @@ public class ComicsViewer extends BaseActivity {
         protected void onPostExecute(Void mVoid) {
             loadNextComics();
         }
+    }
+
+    public void initWebview(){
+        webView.setWebViewClient(new WebViewClient());
+
+        settings = webView.getSettings();
+        settings.setUseWideViewPort(true);
+        settings.setDisplayZoomControls(false);
+        settings.setSupportZoom(true);
+        settings.setLoadWithOverviewMode(true);
+        settings.setJavaScriptEnabled(true);
+        settings.setBuiltInZoomControls(true);
+        settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        settings.setDomStorageEnabled(true);
+        webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+        webView.setScrollbarFadingEnabled(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        } else {
+            webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        }
+        webView.addJavascriptInterface(new JavascriptInterface(this), "Android");
     }
 
     public void createHtml() {
@@ -415,6 +504,23 @@ public class ComicsViewer extends BaseActivity {
             bw.close();
             fw.close();
         } catch (Exception e) {
+        }
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe
+    public void onDivEvent(DivEvent event){
+        Log.i("event", event.isSucceed()+"");
+        if(!isDiv){
+            Intent intent = new Intent(ComicsViewer.this, ComicsViewer.class);
+            intent.putExtra("comicsUrl", comicsUrl);
+            intent.putExtra("episodeUrl", episodeUrl);
+            intent.putExtra("title", title);
+            intent.putExtra("scroll", scroll);
+            intent.putExtra("div", !isDiv);
+            startActivity(intent);
+            overridePendingTransition(0, 0);
+            finish();
         }
     }
 }

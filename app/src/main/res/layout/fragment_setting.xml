@@ -107,6 +107,75 @@
         android:background="@drawable/thin_border">
 
         <LinearLayout
+            android:id="@+id/developer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:paddingLeft="10dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="개발자"
+                android:textSize="15sp"
+                android:textColor="#000000"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="trycatch"
+                android:textColor="#959595"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/thin_border">
+
+        <LinearLayout
+            android:id="@+id/sponsor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:paddingLeft="10dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="후원하기"
+                android:textSize="15sp"
+                android:textColor="#000000"/>
+
+            <TextView
+                android:id="@+id/sponsor_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="비트코인 : 3CYUn9C5e9W8YWnpLYYSVo2gtqtPJPF9QT"
+                android:textColor="#959595"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/thin_border">
+
+        <LinearLayout
             android:id="@+id/update"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

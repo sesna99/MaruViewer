@@ -35,7 +35,7 @@ public class FavoritesListAdapter extends RecyclerView.Adapter {
     private ArrayList<ComicsModel> comicsModel;
     private LayoutInflater inflater;
     private PreferencesManager pm;
-    private int AD_POSITION = 4;
+    private int AD_POSITION = 1;
 
     public FavoritesListAdapter(Context mContext, ArrayList<ComicsModel> comicsModel) {
         this.mContext = mContext;
@@ -59,7 +59,7 @@ public class FavoritesListAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemViewType(int position) {
-        return (position + 1) % AD_POSITION;
+        return (position + 1) / AD_POSITION;
     }
 
     @Override

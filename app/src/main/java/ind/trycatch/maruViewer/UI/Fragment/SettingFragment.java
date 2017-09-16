@@ -2,12 +2,16 @@ package ind.trycatch.maruViewer.UI.Fragment;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,11 +46,22 @@ public class SettingFragment extends Fragment {
     @BindView(R.id.kakao)
     TextView kakao;
 
+    @BindView(R.id.developer)
+    LinearLayout developer;
+
+    @BindView(R.id.sponsor)
+    LinearLayout sponsor;
+
+    @BindView(R.id.sponsor_text)
+    TextView sponsor_text;
+
     @BindView(R.id.update)
     LinearLayout update;
 
     @BindView(R.id.update_text)
     TextView update_text;
+
+    private String BASE_PATH = Environment.getExternalStorageDirectory().toString() + "/마루뷰어/";
 
 
     @Nullable
@@ -121,6 +137,24 @@ public class SettingFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://open.kakao.com/o/g3SsVZw"));
                 startActivity(intent);
+            }
+        });
+
+        developer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://trycatch98.tistory.com/"));
+                startActivity(intent);
+            }
+        });
+
+        sponsor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClipboardManager clipboardManager = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clipData = ClipData.newPlainText("label", "3CYUn9C5e9W8YWnpLYYSVo2gtqtPJPF9QT");
+                clipboardManager.setPrimaryClip(clipData);
+                Toast.makeText(getActivity(), "복사되었습니다. 후원금은 개발자에게 커피 한잔과 새로운 기능을 추가하는 원동력이 됩니다.", Toast.LENGTH_SHORT).show();
             }
         });
 

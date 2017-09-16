@@ -108,7 +108,7 @@ public class MainActivity extends BaseActivity {
                                 try {
                                     intent.putExtra("url", getString(R.string.search, URLEncoder.encode(((EditText)v.findViewById(R.id.edit_text)).getText().toString(), "utf-8")));
                                 }catch (Exception e){
-
+                                    e.printStackTrace();
                                 }
                                 intent.putExtra("category", "검색");
                                 startActivity(intent);

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,7 +92,7 @@ public class SearchFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                Document document = Jsoup.connect(url).userAgent("Mozilla/5.0").timeout(0).get();
+                Document document = Jsoup.connect(url).timeout(0).get();
                 Elements image = document.select("div span[class=thumb] img");
                 Elements link = document.select("div[class=postbox] a");
                 Elements title = document.select("div[class=sbjbox] b");
